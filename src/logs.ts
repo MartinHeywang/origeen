@@ -8,8 +8,6 @@ export enum LogLevel {
     INFO = 1,
     DEBUG = 0,
 }
-
-const command = chalk.cyan("ogy");
 const quote = chalk.magentaBright;
 const important = chalk.bold;
 const underline = chalk.underline;
@@ -18,6 +16,13 @@ let logLevel = LogLevel.INFO;
 
 export function setLogLevel(level: LogLevel) {
     logLevel = level;
+}
+
+export function command(message: string): string{
+    const words = message.split(" ");
+    words[0] = chalk.magenta(words[0]);
+    const command = `\`${chalk.cyan("ogy")} ${words.join(" ")}\``
+    return command;
 }
 
 export function log(level = LogLevel.INFO, message: string) {

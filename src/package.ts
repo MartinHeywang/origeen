@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 
-interface Package {
+export interface Package {
     name: string;
     version: string;
     description?: string;

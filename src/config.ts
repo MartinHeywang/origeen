@@ -3,7 +3,7 @@ import path from "path";
 
 const pathToConfig = path.join(__dirname, "..", "config.json");
 
-interface Config {
+export interface Config {
     [x: string]: string;
 }
 
