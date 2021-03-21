@@ -100,22 +100,22 @@ export function help() {
 function usageDefault(): void {
     log(INFO, `?? How To Use :`);
     log(INFO, "");
-    log(INFO, `   $ ${command} <command> [flags]`);
+    log(INFO, `   $ ${command("<command> [--debug | --warning-only | --error-only]")}`);
     log(INFO, "");
 }
 
 export function usage(usage: string) {
     log(INFO, "?? How To Use:");
-    log(INFO, "");
+    log(INFO, `    $ ${command(usage)}`);
 }
 
 function tryHelpDefault(): void {
-    log(INFO, `Try \`${command} --help\` to learn more.`);
+    log(INFO, `Try \`${command("help")}\` to learn more.`);
 }
 
 export function tryHelpCommand(commandName: string) {
     log(
         INFO,
-        `> Try \`${command} ${commandName} --help\` to learn more about this command.`
+        `> Try \`${command("<command> --help")}\` to learn more about this command.`
     );
 }

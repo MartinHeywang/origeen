@@ -15,7 +15,7 @@ console.log()
 
 if (args.X || args.debug) logs.setLogLevel(0)
 else if (args.E || args["error-only"]) logs.setLogLevel(3)
-else if (args.W || args["warnings-only"]) logs.setLogLevel(2)
+else if (args.W || args["warning-only"]) logs.setLogLevel(2)
 
 if (args._.length < 1) {
     logs.noCommand()

@@ -2,9 +2,10 @@ import { Arguments, string } from "yargs"
 import { help } from "./logs"
 
 import { execute as setup } from "./commands/setup"
-import { execute as open } from "./commands/open"
-import { execute as config } from "./commands/config"
 import { execute as create } from "./commands/create"
+import { execute as open } from "./commands/open"
+import { execute as _delete } from "./commands/delete"
+import { execute as config } from "./commands/config"
 
 export interface Command {
     name: string
@@ -46,6 +47,15 @@ export const commands: Command[] = [
         usageArgs: {
             projectName: "the name of the project to open",
         },
+    },
+    {
+        name: "delete",
+        description: "Deletes a project from the disk",
+        run: (args) => _delete(args),
+        usage: "delete <projectName>",
+        usageArgs: {
+            "projectName": "the name of the project to open"
+        }
     },
     {
         name: "config",
