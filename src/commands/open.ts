@@ -1,5 +1,3 @@
-// Command: opens a project with your editor
-import path from "path"
 import { execSync } from "child_process"
 
 import { Arguments } from "yargs"
@@ -26,7 +24,7 @@ export function execute(args: Arguments): void {
         process.exit()
     }
 
-    const projectPath = path.join(config.projectsFolder, project.path)
+    const projectPath = project.path
     const editorPath = config.editorPath
     if (editorPath == undefined) {
         logs.log(3, `You did not provide the path to your favorite editor.`)

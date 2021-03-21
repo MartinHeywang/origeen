@@ -63,7 +63,7 @@ export function commandNotFound(commandName: string): void {
 
 export function projectNotFound(projectName: string): void {
     log(ERROR, `The given project name \`${quote(projectName)}\` was not found.`);
-    log(ERROR, `Try \`${command} projects\` to see your projects.`);
+    log(ERROR, `Try ${command("projects")} to see your projects.`);
 }
 
 export function noCommand(): void {

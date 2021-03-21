@@ -4,6 +4,7 @@ import { help } from "./logs"
 import { execute as setup } from "./commands/setup"
 import { execute as open } from "./commands/open"
 import { execute as config } from "./commands/config"
+import { execute as create } from "./commands/create"
 
 export interface Command {
     name: string
@@ -24,6 +25,16 @@ export const commands: Command[] = [
         run: async (args) => await setup(args),
         usage: "setup",
         usageArgs: {},
+    },
+    {
+        name: "create",
+        "description": "Create a new project",
+        run: async (args) => await create(args),
+        aliases: ["c"],
+        usage: "create <projectName>",
+        usageArgs: {
+            "projectName": "the name of the new project"
+        }
     },
     {
         name: "open",
