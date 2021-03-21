@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "author": "Martin Heywang",
   "license": "MIT",
+  "keywords": ["organisation", "projects"],
   "scripts": {
     "start": "node dist/index.js",
     "watch": "tsc --watch"
@@ -25,5 +26,10 @@
     "console-table-printer": "^2.8.2",
     "stdio": "^2.1.1",
     "yargs": "^16.2.0"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MartinHeywang/origeen"
   }
 }
