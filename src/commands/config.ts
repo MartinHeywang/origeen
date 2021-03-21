@@ -1,6 +1,6 @@
 import { Arguments } from "yargs"
 
-import { getConfig } from "../config"
+import { getConfig, setConfig } from "../config"
 import * as logs from "../logs"
 
 export function execute(args: Arguments) {
@@ -29,6 +29,8 @@ export function execute(args: Arguments) {
 
     logs.log(0, `Setting config ${configName}`)
 
-    const newValue = args.S ?? args.set
+    const newValue = args.S as string ?? args.set as string;
     logs.log(1, `Set '${configName}' to '${newValue}'`)
+    config[configName] = newValue;
+    setConfig(config);
 }
