@@ -1,0 +1,9 @@
+# Node Modules
+node_modules/**
+
+# Built JavaScript
+dist/**
+
+# Data files
+config.json
+projects.json
