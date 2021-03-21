@@ -6,6 +6,7 @@ import { execute as create } from "./commands/create"
 import { execute as open } from "./commands/open"
 import { execute as _delete } from "./commands/delete"
 import { execute as config } from "./commands/config"
+import { execute as projects } from "./commands/projects"
 
 export interface Command {
     name: string
@@ -26,6 +27,13 @@ export const commands: Command[] = [
         run: async (args) => await setup(args),
         usage: "setup",
         usageArgs: {},
+    },
+    {
+        name: "projects",
+        description: "List all your projects",
+        run: async (args) => await projects(args),
+        usage: "projects",
+        usageArgs: {}
     },
     {
         name: "create",
