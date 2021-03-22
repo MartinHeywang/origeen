@@ -26,30 +26,23 @@ export function execute(args: Arguments) {
     if (alreadyExist) {
         logs.log(
             3,
-            `You already used this name for a project. Pickup another one !`
+            `You already used this name for a project. Pick another one !`
         )
         return
     }
 
-    logs.log(1, `Creating project '${projectName}' at '${pathToProject}'`)
+    const templateName = args.template as string || "empty"
+    const templatePath = path.join(__dirname, "..", "..", "templates", templateName);
+
+    logs.log(1, `Creating project '${projectName}'`)
+    logs.log(1, `At '${pathToProject}'`)
+    logs.log(1, `Using template '${templateName}'`)
 
     logs.log(0, `Creating folder at ${pathToProject}`)
-    fs.mkdirSync(pathToProject)
+    
+    execSync(`cp ${templatePath} ${pathToProject} -r`);
     logs.log(0, `Created!`)
     logs.log(0, `Adding new project to 'projects.json'`)
     addProject({ name: projectName, path: pathToProject })
     logs.log(0, `Added!`)
-
-    const command = `orgn open ${projectName}`;
-    logs.log(1, "Opening newly created project...")
-    logs.log(0, `Running: ${command}`);
-   try {
-        const output = execSync(command);
-        console.group();
-        console.log(output);
-        console.groupEnd();
-   }catch(err) {
-       logs.log(3, `An error occured while opening the project.`);
-       logs.log(3, `See the logs above`);
-   }
 }
