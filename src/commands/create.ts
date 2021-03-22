@@ -1,5 +1,4 @@
-import fs from "fs"
-import { execSync } from "child_process"
+import fs from "fs-extra"
 import path from "path"
 import { Arguments } from "yargs"
 import { getConfig } from "../config"
@@ -56,12 +55,11 @@ export function execute(args: Arguments) {
     log(`Using template '${templateName}'`)
     log()
 
-    const command = `cp ${templatePath} ${pathToProject} -r`
-    debug(`Executing command synchronously: ${command}`)
-
-    execSync(command)
-    debug(`Template copied!`)
+    debug(`Copying template to the project destination`);
+    fs.copySync(templatePath, pathToProject);
+    debug(`Copied!`)
     debug()
+
     debug(`Adding new project to 'projects.json'`)
     addProject({ name: projectName, path: pathToProject })
     debug(`Added!`)
