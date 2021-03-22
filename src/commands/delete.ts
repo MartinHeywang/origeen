@@ -1,30 +1,46 @@
 import fs from "fs"
 import { Arguments } from "yargs"
 
-import * as logs from "../logs"
+import { h1 } from "../logs"
 import { deleteProject, getProjects } from "../projects"
 
-export function execute(args: Arguments){
-    const projectName = args._[1]?.toString();
+export function execute(args: Arguments) {
+    const { log, debug, error } = console
+    const projectName = args._[1]?.toString()
 
-    if(projectName == undefined) {
-        logs.log(3, `You did not provide any project to delete`);
+    h1("Project deletion")
+
+    if (projectName == undefined) {
+        error(`You did not provide any project to delete`)
         return
     }
 
-    logs.log(0, `Searching for project named '${projectName}'`);
-    const project = getProjects().find(project => project.name == projectName);
-    if(project == undefined) {
-        logs.projectNotFound(projectName)
+    debug(`Searching for project named '${projectName}'`)
+    const project = getProjects().find((project) => project.name == projectName)
+    if (project == undefined) {
+        error(`A project named \`${projectName}\` wasn't found.`)
+        error(`Did you misspell it?`)
+        error()
         return
     }
-    logs.log(0, "Found one !");
+    debug("Found one !")
+    debug()
 
-    logs.log(0, `Deleting project '${projectName}' from 'projects.json'`);
-    deleteProject(project);
-    logs.log(0, "Deleted!");
-    logs.log(0, `Removing folder at: ${project.path}`);
-    fs.rmdirSync(project.path);
-    logs.log(0, "Removed!");
-    logs.log(1, `The project named ${projectName} has been successfully deleted from your disk !`);
+    log(`Deleting project named : '${projectName}'`)
+    log(`At: '${project.path}'`)
+    log()
+
+    debug(`Removing folder at: ${project.path}`)
+    fs.rmdirSync(project.path)
+    debug("Removed!")
+    debug()
+    debug(
+        `The project named ${projectName} has been successfully deleted from your disk !`
+    )
+    debug()
+    debug(`Deleting project '${projectName}' from 'projects.json'`)
+    deleteProject(project)
+    debug("Deleted!")
+    debug()
+    log("Done !")
 }

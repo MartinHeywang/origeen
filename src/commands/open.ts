@@ -4,49 +4,60 @@ import { Arguments } from "yargs"
 
 import { Project, getProjects } from "../projects"
 import { getConfig } from "../config"
-import * as logs from "../logs"
+import { h1 } from "../logs"
 
 export function execute(args: Arguments): void {
+    const { debug, log, error } = console
+
+    h1("Project Opening")
+
     const config = getConfig()
     const projects = getProjects()
 
     const projectName: string = args._[1]?.toString()
     if (projectName == undefined) {
-        logs.log(3, `You did not provide a project to open.`)
-        process.exit()
+        error(`You did not provide a project to open.`)
+        return
     }
-    logs.log(0, `Project name : '${projectName}'`)
+
+    log(`Project name : '${projectName}'`)
+    log()
     const project: Project | undefined = projects.find(
         (project) => project.name === projectName
     )
     if (project == undefined) {
-        logs.projectNotFound(projectName)
-        process.exit()
-    }
-
-    const projectPath = project.path
-    const editorPath = config.editorPath
-    if (editorPath == undefined) {
-        logs.log(3, `You did not provide the path to your favorite editor.`)
-        logs.log(
-            3,
-            `You can set it with : ${logs.command(
-                "config editorPath --set <pathToEditor>"
-            )}`
-        )
+        error(`A project named \`${projectName}\` wasn't found.`)
+        error()
         return
     }
 
+    const projectPath = project.path
+    debug(`Path to Project :`)
+    debug(projectPath)
+    debug()
+    const editorPath = config.editorPath
+    if (editorPath == undefined) {
+        error(`You did not provide the path to your favorite editor.`)
+        error(
+            `You can set it with : "orgn config editorPath --set <pathToEditor>"`
+        )
+        return
+    }
+    debug(`Path to editor :`)
+    debug(editorPath)
+    debug()
+
     const command = `"${editorPath}" "${projectPath}"`
-    logs.log(1, `Running : '${command}'`)
+    log(`Running : '${command}'`)
     try {
-        execSync(command);
+        execSync(command)
     } catch (err) {
-        logs.log(3, `There was an error executing the command.`)
-        logs.log(3, `Hopefully, here is what you can do :`)
-        logs.log(3, `  - Make sure your correctly set your editor.`)
-        logs.log(3, `  - Try to run the command manually to see if the errors happens again.`)
-        logs.log(3, `  - See the logs above for more details.`)
-        logs.log(3, `  - Open an issue if you really don't know why it happens.`)
+        error(`There was an error executing the command.`)
+        error(`Hopefully, here is a few thing you can do :`)
+        error(`  - Make sure your correctly set your editor.`)
+        error(`  - Try to run the command manually to see if the error occurs again.`)
+        error(`  - See the logs above for more details.`)
+        error(`  - Re-run this command with the -X switch (debug mode)`)
+        error(`  - Open an issue if you really don't know why it happens.`)
     }
 }

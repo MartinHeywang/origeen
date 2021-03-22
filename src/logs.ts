@@ -7,44 +7,43 @@ export enum LogLevel {
     DEBUG = 0,
 }
 
-let groupIndent = "";
+let groupIndent = ""
 
 export function setup(logLevel: LogLevel) {
     const { ERROR, WARNING, INFO } = LogLevel
 
     console.error = (message = "") => {
-        process.stdout.write(`[${chalk.red("ERROR")}]   ${message}\n`)
+        process.stdout.write(
+            `[${chalk.red("ERROR")}]   ${groupIndent}${message}\n`
+        )
     }
     console.warn = (message = "") => {
         if (logLevel === ERROR) return
-        process.stdout.write(`[${chalk.yellow("WARNING")}] ${message}\n`)
+        process.stdout.write(
+            `[${chalk.yellow("WARNING")}] ${groupIndent}${message}\n`
+        )
     }
     console.log = (message = "") => {
         if (logLevel === (WARNING || ERROR)) return
-        process.stdout.write(`[${chalk.blue("INFO")}]    ${message}\n`)
+        process.stdout.write(
+            `[${chalk.blue("INFO")}]    ${groupIndent}${message}\n`
+        )
     }
     console.debug = (message = "") => {
         if (logLevel === (WARNING || ERROR || INFO)) return
-        process.stdout.write(`[${chalk.cyan("DEBUG")}]   ${message}\n`)
+        process.stdout.write(
+            `[${chalk.cyan("DEBUG")}]   ${groupIndent}${message}\n`
+        )
     }
     console.group = () => {
-        groupIndent += "    ";
+        groupIndent += "    "
     }
     console.groupEnd = () => {
         groupIndent = groupIndent.substring(3)
     }
 }
 
-// const table = new Table({
-//     title: "Commands",
-//     columns: [
-//         { name: "name", alignment: "left" },
-//         { name: "description", alignment: "right" },
-//         { name: "aliases", alignment: "right" },
-//     ],
-//     disabledColumns: ["run", "usageArgs"],
-// })
-
-// table.addRows(commands)
-
-// table.printTable()
+export function h1(message: string) {
+    console.log(chalk.bold.yellow(message.toUpperCase()));
+    console.log()
+}
