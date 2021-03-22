@@ -1,5 +1,4 @@
 import { Arguments, string } from "yargs"
-import { help } from "./logs"
 
 import { execute as setup } from "./commands/setup"
 import { execute as create } from "./commands/create"
@@ -7,6 +6,7 @@ import { execute as open } from "./commands/open"
 import { execute as _delete } from "./commands/delete"
 import { execute as config } from "./commands/config"
 import { execute as projects } from "./commands/projects"
+import { execute as help } from "./commands/help"
 
 export interface Command {
     name: string
@@ -79,7 +79,7 @@ export const commands: Command[] = [
         name: "help",
         usage: "help",
         usageArgs: {},
-        description: "Shows the help for ogy",
+        description: "Shows the help for orgn",
         run: () => help(),
         aliases: ["h"],
     },

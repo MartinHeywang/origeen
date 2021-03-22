@@ -13,22 +13,14 @@ const packageInfo: Package = getPackageInfo()
 
 console.log()
 
-if (args.X || args.debug) logs.setLogLevel(0)
-else if (args.E || args["error-only"]) logs.setLogLevel(3)
-else if (args.W || args["warning-only"]) logs.setLogLevel(2)
-
-if (args._.length < 1) {
-    logs.noCommand()
-    process.exit()
-}
+if (args.X || args.debug) logs.setup(logs.LogLevel.DEBUG)
+else if (args.E || args["error-only"]) logs.setup(logs.LogLevel.ERROR)
+else if (args.W || args["warning-only"]) logs.setup(logs.LogLevel.WARNING)
+else logs.setup(logs.LogLevel.INFO)
 
 const commandName = args._[0].toString()
 const command: Command | undefined = commands.find(
     (cmd) => cmd.name === commandName || cmd.aliases?.includes(commandName)
 )
-if (command == undefined) {
-    logs.commandNotFound(commandName)
-    process.exit()
-}
 
-command.run(args)
+command?.run(args)
