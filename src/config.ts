@@ -7,13 +7,32 @@ export interface Config {
     [x: string]: string;
 }
 
-export function getConfig(): Config {
-    const config: Config = JSON.parse(
-        fs.readFileSync(pathToConfig, "utf8")
-    );
-    return config;
+function* loadConfig() {
+    const config: Config = JSON.parse(fs.readFileSync(pathToConfig, "utf8"))
+
+    while(true) {
+        yield config
+    }
 }
 
-export function setConfig(config: Config): void {
+const _loadConfig = loadConfig()
+
+export function getConfig(): Config {
+    // We know the generator won't return void
+    return _loadConfig.next().value as Config
+}
+
+function setConfig(config: Config): void {
     fs.writeFileSync(pathToConfig, JSON.stringify(config));
+}
+
+export function getProperty(property: string) {
+    return getConfig()[property]
+}
+
+export function setProperty(property: string, newValue: string) {
+    const config = getConfig()
+
+    config[property] = newValue
+    setConfig(config)
 }

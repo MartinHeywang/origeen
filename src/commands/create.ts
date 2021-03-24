@@ -16,7 +16,7 @@ export function execute(args: Arguments) {
         error(`You did not provide a project name`)
         return
     }
-    const pathToProject = path.join(config.projectsFolder, args._[1] as string)
+    const pathToProject = path.join(config.workspace, args._[1] as string)
     
 
     const pathToProjectSegments = pathToProject.split("\\")
