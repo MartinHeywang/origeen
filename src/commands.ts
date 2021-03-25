@@ -3,6 +3,7 @@ import { Arguments, string } from "yargs"
 import { execute as setup } from "./commands/setup"
 import { execute as create } from "./commands/create"
 import { execute as open } from "./commands/open"
+import { execute as _import } from "./commands/import"
 import { execute as _delete } from "./commands/delete"
 import { execute as config } from "./commands/config"
 import { execute as projects } from "./commands/projects"
@@ -55,6 +56,16 @@ export const commands: Command[] = [
         usageArgs: {
             projectName: "the name of the project to open",
         },
+    },
+    {
+        name: "import",
+        description: "Imports an exisiting project into Origeen",
+        run: (args) => _import(args),
+
+        usage: "import <pathToProject>",
+        usageArgs: {
+            "pathToProject": "the absolute path to the project"
+        }
     },
     {
         name: "delete",
