@@ -1,6 +1,6 @@
 {
   "name": "origeen",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A CLI-tool to help you get started with all your projects in seconds !",
   "main": "dist/index.js",
   "author": "Martin Heywang",

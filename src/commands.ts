@@ -5,6 +5,7 @@ import { execute as create } from "./commands/create"
 import { execute as open } from "./commands/open"
 import { execute as _import } from "./commands/import"
 import { execute as _delete } from "./commands/delete"
+import { execute as installTemplate } from "./commands/installTemplate"
 import { execute as config } from "./commands/config"
 import { execute as projects } from "./commands/projects"
 import { execute as help } from "./commands/help"
@@ -65,6 +66,19 @@ export const commands: Command[] = [
         usage: "import <pathToProject>",
         usageArgs: {
             "pathToProject": "the absolute path to the project"
+        }
+    },
+    {
+        name: "install-template",
+        description: "Clones a GitHub repo or a folder to create a template",
+        run: async(args) => installTemplate(args),
+        aliases: ["it"],
+
+        usage: "install-template [--local <pathToFolder> | --remote <urlToGitRepo>] [templateName]",
+        usageArgs: {
+            "pathToFolder": "when specified with the --local flag, an absolute path to a local folder",
+            "urlToGitRepo": "when specified with the --remote flag, a url to a git repository",
+            "templateName": "the name of the copied template"
         }
     },
     {
