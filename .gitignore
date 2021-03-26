@@ -7,4 +7,7 @@ dist/**
 # Data files
 config.json
 projects.json
+
+# Templates
 templates/**
+!templates/empty

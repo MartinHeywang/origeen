@@ -1,18 +1,18 @@
-import fs from "fs"
+import fs from "fs-extra"
 import path from "path"
 
-const pathToProjects = path.join(__dirname, "..", "projects.json")
+export const pathToProjects = path.join(process.env.HOME as string, "origeen", "projects.json")
 export interface Project {
     name: string
     path: string
 }
 
-const _loadProjects = loadProjects()
+let _loadProjects = loadProjects()
 
 function* loadProjects() {
-    const file = fs.readFileSync(pathToProjects, "utf8")
-    const projects: Project[] = JSON.parse(file)
-    while (true) {
+    const projects = fs.readJSONSync(pathToProjects)
+
+    while(true) {
         yield projects
     }
 }
@@ -24,6 +24,8 @@ export function getProjects() {
 
 function setProjects(projects: Project[]): void {
     fs.writeFileSync(pathToProjects, JSON.stringify(projects))
+    // Re-create the generator to make sure the last version of projects.json is used
+    _loadProjects = loadProjects()
 }
 
 export function addProject(newProject: Project): void {

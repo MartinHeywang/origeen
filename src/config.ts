@@ -1,21 +1,28 @@
-import fs from "fs";
-import path from "path";
+import fs from "fs-extra"
+import path from "path"
 
-const pathToConfig = path.join(__dirname, "..", "config.json");
+export const pathToConfig = path.join(process.env.HOME as string, "origeen", "config.json")
 
 export interface Config {
-    [x: string]: string;
+    [x: string]: string
 }
 
 function* loadConfig() {
-    const config: Config = JSON.parse(fs.readFileSync(pathToConfig, "utf8"))
+    const {debug} = console
 
-    while(true) {
+    const config: Config = fs.readJSONSync(pathToConfig)
+    debug("The config file has been loaded.")
+    debug(JSON.stringify(config, undefined, 4))
+    debug()
+    debug(`Path: ${pathToConfig}`)
+    debug()
+    
+    while (true) {
         yield config
     }
 }
 
-const _loadConfig = loadConfig()
+let _loadConfig = loadConfig()
 
 export function getConfig(): Config {
     // We know the generator won't return void
@@ -23,7 +30,8 @@ export function getConfig(): Config {
 }
 
 function setConfig(config: Config): void {
-    fs.writeFileSync(pathToConfig, JSON.stringify(config));
+    fs.writeFileSync(pathToConfig, JSON.stringify(config))
+    _loadConfig = loadConfig()
 }
 
 export function getProperty(property: string) {
