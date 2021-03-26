@@ -1,5 +1,7 @@
 import chalk from "chalk"
 
+import { ask as _ask } from "stdio"
+
 export enum LogLevel {
     ERROR = "ERROR",
     WARNING = "WARNING",
@@ -52,4 +54,42 @@ export function setup(logLevel: LogLevel) {
 export function h1(message: string) {
     console.log(chalk.bold.yellow(message.toUpperCase()))
     console.log()
+}
+
+export function h3(message: string) {
+    console.log()
+    console.log(chalk.bold("## " + message.toUpperCase()))
+    console.log()
+}
+
+export function bashBlock(bash: string, internal = true) {
+    console.log()
+    console.log(`  $${internal && " orgn"} ${bash}`)
+    console.log()
+}
+
+export function link(url: string) {
+    return chalk.blue.underline(url)
+}
+
+type ValidatorFunction = (answer: string) => string | undefined
+
+export async function ask(
+    question: string,
+    validate: ValidatorFunction
+): Promise<string> {
+    return new Promise(async (resolve) => {
+        let answer = ""
+        while (true) {
+            answer = await _ask(`[${chalk.magenta("WAIT")}]    ${question}`)
+
+            let message: string | undefined = validate(answer)
+            if (message == undefined) {
+                resolve(answer)
+                break
+            }
+
+            console.warn(message)
+        }
+    })
 }
