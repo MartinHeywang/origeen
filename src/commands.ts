@@ -1,4 +1,4 @@
-import { Arguments, string } from "yargs"
+import { Arguments } from "yargs"
 
 import { execute as setup } from "./commands/setup"
 import { execute as create } from "./commands/create"
@@ -6,6 +6,7 @@ import { execute as open } from "./commands/open"
 import { execute as _import } from "./commands/import"
 import { execute as _delete } from "./commands/delete"
 import { execute as installTemplate } from "./commands/installTemplate"
+import { execute as deleteTemplate } from "./commands/deleteTemplate"
 import { execute as config } from "./commands/config"
 import { execute as projects } from "./commands/projects"
 import { execute as help } from "./commands/help"
@@ -80,6 +81,15 @@ export const commands: Command[] = [
             "urlToGitRepo": "when specified with the --remote flag, a url to a git repository",
             "templateName": "the name of the copied template"
         }
+    },
+    {
+        name: "delete-template",
+        description: "Deletes a previously installed template",
+        run: async(args) => deleteTemplate(args),
+        aliases: ["dt"],
+
+        usage: "delete-template <templateName>",
+        usageArgs: {}
     },
     {
         name: "delete",
