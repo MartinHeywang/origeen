@@ -1,5 +1,16 @@
 # Origeen's changelog
 
+## **All the versions below are not working :**
+**Even though some of them are published to the npm registry**
+
+### v0.3.2 - v0.3.3
+
+No bug fixes, no new feature
+
+This is my first package published to the npm registry... and I made mistakes with dependencies, ignore files...
+
+---
+
 ### v0.3.1
 
 - Moved config.json and projects.json into the user root folder and undzer /origeen. Also, they are silently created when they does not exist.
