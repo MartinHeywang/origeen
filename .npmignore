@@ -1,0 +1,10 @@
+.github/**
+.vscode/**
+tsconfig.json
+
+src/**
+!src/**/*.ts
+
+templates/**
+
+CHANGELOG.md
