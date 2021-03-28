@@ -1,5 +1,9 @@
 # Origeen's changelog
 
+### v0.3.4
+
+- Fixing edge cases on templates
+
 ## **All the versions below are not working :**
 **Even though some of them are published to the npm registry**
 

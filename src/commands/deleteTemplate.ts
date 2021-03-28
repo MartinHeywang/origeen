@@ -1,29 +1,17 @@
 import { Arguments } from "yargs"
-
-import fs from "fs-extra"
-import path from "path"
-
 import { h1 } from "../logs"
 
+import { remove } from "../templates"
+
 export function execute(args: Arguments) {
-    const { error, log } = console
+    const { log } = console
+
+    h1("Template removal")
 
     const templateName = args._[1]?.toString()
-    if (templateName == undefined) {
-        error("You did not provide a template name to remove.")
-    }
-    if(templateName == "empty") {
-        error("The template 'empty' is not deletable.")
-    }
+    log(`Removing template : ${templateName}`)
 
-    const pathToTemplate = path.join(
-        __dirname,
-        "..",
-        "..",
-        "templates",
-        templateName
-    )
-    fs.rmdirSync(pathToTemplate, {
-        recursive: true,
-    })
+    remove(templateName)
+
+    log("Done successfully!")
 }

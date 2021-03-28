@@ -1,6 +1,6 @@
 {
   "name": "origeen",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A CLI-tool to help you get started with all your projects in seconds !",
   "main": "dist/index.js",
   "author": "Martin Heywang",
@@ -20,7 +20,7 @@
     "node": ">=12"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.8",
+    "@types/fs-extra": "^9.0.9",
     "@types/node": "^14.14.35",
     "@types/underscore.string": "^0.0.38",
     "@types/yargs": "^16.0.0",

@@ -1,38 +1,38 @@
 #!/usr/bin/env node
 import { getArgs } from "./args"
-import { pathToConfig } from "./config"
-import { pathToProjects } from "./projects"
-import { Arguments } from "yargs"
-import * as logs from "./logs"
-
 import { Command, commands } from "./commands"
 
-import fs from "fs-extra"
-import path from "path"
+import * as paths from "./paths"
+import * as logs from "./logs"
 
 // Skip a line for white space :)
 console.log()
 
 // Configure logs
-const args: Arguments = getArgs()
+const args = getArgs()
 if (args.X || args.debug) logs.setup(logs.LogLevel.DEBUG)
 else if (args.E || args["error-only"]) logs.setup(logs.LogLevel.ERROR)
 else if (args.W || args["warning-only"]) logs.setup(logs.LogLevel.WARNING)
 else logs.setup(logs.LogLevel.INFO)
 
-// Ensure that config files exists
-if (!fs.existsSync(pathToConfig)) {
-    fs.ensureDirSync(path.join(process.env.HOME as string, "origeen"))
-    fs.writeFileSync(pathToConfig, "{}")
-}
-if (!fs.existsSync(pathToProjects)) {
-    fs.ensureDirSync(path.join(process.env.HOME as string, "origeen"))
-    fs.writeFileSync(pathToProjects, "[]")
-}
+paths.ensure()
 
 const commandName = args._[0]?.toString()
+if (commandName == undefined) {
+    console.error("You did not give any command to execute.")
+    process.exit()
+}
 const command: Command | undefined = commands.find(
     (cmd) => cmd.name === commandName || cmd.aliases?.includes(commandName)
 )
+if (command == undefined) {
+    console.error(`Command ${commandName} not found.`)
+    process.exit()
+}
 
-command?.run(args)
+try {
+    command.run(args)
+} catch (err) {
+    console.error("An error occured. Message :")
+    console.error(err)
+}
