@@ -111,7 +111,8 @@ function isReservedName(name: string): boolean {
  * @param name the name to validate
  * @returns an error message (string) if the name is not valid, otherwiser false
  */
-function isValidName(name: string): string | undefined {
+function isValidName(name: string): boolean {
     const regex = new RegExp(`^[a-zA-Z0-9]+$`)
-    if (name.match(regex)) return `The provided name doesn't match: '${regex.source}'`
+    if (name.match(regex)) return false
+    return true
 }

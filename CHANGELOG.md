@@ -2,6 +2,8 @@
 
 ### v0.3.4
 
+- Improved error handling and log system
+
 - Fixing edge cases on templates
 
 ## **All the versions below are not working :**

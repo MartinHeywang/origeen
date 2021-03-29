@@ -11,14 +11,36 @@ import { execute as config } from "./commands/config"
 import { execute as projects } from "./commands/projects"
 import { execute as help } from "./commands/help"
 
+export class OrigeenError extends Error {
+    advices
+
+    constructor(message: string, advices: string[]) {
+        super(message)
+        this.advices = advices
+    }
+}
+
+export async function executeCommand(commandName: string, args: Arguments): Promise<void> {
+    const command = commands.find(
+        (cmd) => cmd.name === commandName || cmd.aliases?.includes(commandName)
+    )
+
+    if(command == undefined) {
+        throw new OrigeenError(`Unkwown command '${commandName}'`, [
+            "Check the spelling",
+            "Run 'orgn' to list the available commands"
+        ]);
+    }
+
+    await command?.run(args)
+}
+
 export interface Command {
     name: string
-    usage: string
-    usageArgs: {
-        [x: string]: string
-    }
     description: string
-    run: (args: Arguments) => void
+    usage: string
+
+    run: (args: Arguments) => Promise<void>
 
     aliases?: string[]
 }
@@ -26,96 +48,73 @@ export interface Command {
 export const commands: Command[] = [
     {
         name: "setup",
-        description: "Launch the ogy setup process",
+        description: "Launches the origeen setup process",
         run: async (args) => await setup(args),
+
         usage: "setup",
-        usageArgs: {},
     },
     {
         name: "projects",
-        description: "List all your projects",
-        run: async (args) => await projects(args),
+        description: "Lists all your projects",
+        run: async (args) => projects(args),
         usage: "projects",
-        usageArgs: {}
     },
     {
         name: "create",
-        "description": "Create a new project",
-        run: async (args) => await create(args),
+        description: "Creates a new project",
+        run: async (args) => create(args),
         aliases: ["c"],
         usage: "create <projectName>",
-        usageArgs: {
-            "projectName": "the name of the new project"
-        }
     },
     {
         name: "open",
         description: "Opens a project with your favourite editor",
-        run: (args) => open(args),
+        run: async (args) => open(args),
         aliases: ["o"],
 
         usage: "open <projectName>",
-        usageArgs: {
-            projectName: "the name of the project to open",
-        },
     },
     {
         name: "import",
         description: "Imports an exisiting project into Origeen",
-        run: (args) => _import(args),
+        run: async (args) => _import(args),
 
         usage: "import <pathToProject>",
-        usageArgs: {
-            "pathToProject": "the absolute path to the project"
-        }
     },
     {
         name: "install-template",
         description: "Clones a GitHub repo or a folder to create a template",
-        run: async(args) => installTemplate(args),
+        run: async (args) => installTemplate(args),
         aliases: ["it"],
 
-        usage: "install-template [--local <pathToFolder> | --remote <urlToGitRepo>] [templateName]",
-        usageArgs: {
-            "pathToFolder": "when specified with the --local flag, an absolute path to a local folder",
-            "urlToGitRepo": "when specified with the --remote flag, a url to a git repository",
-            "templateName": "the name of the copied template"
-        }
+        usage:
+            "install-template [--local <pathToFolder> | --remote <urlToGitRepo>] [templateName]",
     },
     {
         name: "delete-template",
         description: "Deletes a previously installed template",
-        run: async(args) => deleteTemplate(args),
+        run: async (args) => deleteTemplate(args),
         aliases: ["dt"],
 
         usage: "delete-template <templateName>",
-        usageArgs: {}
     },
     {
         name: "delete",
         description: "Deletes a project from the disk",
-        run: (args) => _delete(args),
+        run: async (args) => _delete(args),
         usage: "delete <projectName>",
-        usageArgs: {
-            "projectName": "the name of the project to open"
-        }
     },
     {
         name: "config",
         description: "Get/Set values in the config file",
-        run: (args) => config(args),
+        run: async (args) => config(args),
         usage: "config [configName [--set <newConfigValue>] ]",
-        usageArgs: {
-            configName: "the name of a property",
-            newConfigValue: "the new value for the config",
-        },
     },
     {
         name: "help",
         usage: "help",
-        usageArgs: {},
         description: "Shows the help for orgn",
-        run: () => help(),
+        run: async () => help(),
         aliases: ["h"],
     },
 ]

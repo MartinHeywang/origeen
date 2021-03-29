@@ -2,6 +2,7 @@ import { Arguments } from "yargs"
 import { add } from "../templates"
 
 import { h1 } from "../logs"
+import { OrigeenError } from "../commands"
 
 export function execute(args: Arguments) {
     const { error, log } = console
@@ -32,10 +33,12 @@ export function execute(args: Arguments) {
         add(templateName, remoteURL, true)
         return
     }
-
-    error("Oups!")
-    error("Origeen needs a source to create a template : either a local path or a remote URL.")
-    error("You can specify the source with one of these two flags:")
-    error("  --local  <localPath>")
-    error("  --remote <remoteURL>")
+    
+    throw new OrigeenError(
+        "Origeen needs a source to create a template : either a local path or a remote URL.",
+        [
+            "Specify the '--local <localPath>' flag to copy a local folder",
+            "Specify the '--remote <url>' flag to clone a remote git repository"
+        ]
+    )
 }

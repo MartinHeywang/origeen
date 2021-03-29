@@ -5,6 +5,7 @@ import { Arguments } from "yargs"
 import { Project, getProjects } from "../projects"
 import { getConfig } from "../config"
 import { h1 } from "../logs"
+import { OrigeenError } from "../commands"
 
 export function execute(args: Arguments): void {
     const { debug, log, error } = console
@@ -16,8 +17,9 @@ export function execute(args: Arguments): void {
 
     const projectName: string = args._[1]?.toString()
     if (projectName == undefined) {
-        error(`You did not provide a project to open.`)
-        return
+        throw new OrigeenError("In order to open a project, you need to provide its name.", [
+            "Provide '<projectName>' after the command name",
+        ])
     }
 
     log(`Project name : '${projectName}'`)
@@ -26,9 +28,12 @@ export function execute(args: Arguments): void {
         (project) => project.name === projectName
     )
     if (project == undefined) {
-        error(`A project named \`${projectName}\` wasn't found.`)
-        error()
-        return
+        throw new OrigeenError(
+            `A project named \`${projectName}\` wasn't found.`,[
+                "Check the spelling",
+                "Run the 'projects' command to list all your projects",
+            ]
+        )
     }
 
     const projectPath = project.path
@@ -41,23 +46,23 @@ export function execute(args: Arguments): void {
         error(
             `You can set it with : "orgn config editorPath --set <pathToEditor>"`
         )
-        return
+        throw new OrigeenError("You did not set the path to your favourite code editor", [
+            "Set it with: 'origeen config editorPath --set <pathToEditor>"
+        ])
     }
     debug(`Path to editor :`)
     debug(editorPath)
     debug()
 
     const command = `"${editorPath}" "${projectPath}"`
-    log(`Running : '${command}'`)
+    debug(`Running : '${command}'`)
     try {
         execSync(command)
     } catch (err) {
-        error(`There was an error executing the command.`)
-        error(`Hopefully, here is a few thing you can do :`)
-        error(`  - Make sure your correctly set your editor.`)
-        error(`  - Try to run the command manually to see if the error occurs again.`)
-        error(`  - See the logs above for more details.`)
-        error(`  - Re-run this command with the -X switch (debug mode)`)
-        error(`  - Open an issue if you really don't know why it happens.`)
+        throw new OrigeenError(`There was an error executing the command :\n'${command}'`, [
+            "See the logs to know what happened",
+            "Check that the path to your editor is correct",
+            "Run the command manually"
+        ])
     }
 }

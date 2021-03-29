@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { getArgs } from "./args"
-import { Command, commands } from "./commands"
+import { executeCommand, OrigeenError } from "./commands"
 
 import * as paths from "./paths"
 import * as logs from "./logs"
@@ -8,31 +8,56 @@ import * as logs from "./logs"
 // Skip a line for white space :)
 console.log()
 
-// Configure logs
-const args = getArgs()
-if (args.X || args.debug) logs.setup(logs.LogLevel.DEBUG)
-else if (args.E || args["error-only"]) logs.setup(logs.LogLevel.ERROR)
-else if (args.W || args["warning-only"]) logs.setup(logs.LogLevel.WARNING)
-else logs.setup(logs.LogLevel.INFO)
+async function main() {
+    const startTime = Date.now()
 
-paths.ensure()
+    // Configure logs
+    const args = getArgs()
+    if (args.X || args["debug"]) logs.setup(logs.LogLevel.DEBUG)
+    else if (args.E || args["error-only"]) logs.setup(logs.LogLevel.ERROR)
+    else if (args.W || args["warning-only"]) logs.setup(logs.LogLevel.WARNING)
+    else logs.setup(logs.LogLevel.INFO)
 
-const commandName = args._[0]?.toString()
-if (commandName == undefined) {
-    console.error("You did not give any command to execute.")
-    process.exit()
-}
-const command: Command | undefined = commands.find(
-    (cmd) => cmd.name === commandName || cmd.aliases?.includes(commandName)
-)
-if (command == undefined) {
-    console.error(`Command ${commandName} not found.`)
-    process.exit()
+    paths.ensure()
+
+    const commandName = args._[0]?.toString() ?? "help"
+
+    try {
+        await executeCommand(commandName, args)
+
+        const takenTime = Date.now() - startTime
+        console.log()
+        console.log(`Command executed successfully in ${takenTime}ms`)
+    } catch (err) {
+        const { error, group, groupEnd } = console
+
+        const takenTime = Date.now() - startTime
+
+        error("Ouch!")
+        error()
+
+        if (err.message) {
+            err.message.split("\n").forEach((line: string) => {
+                error(line)
+            })
+            error()
+        }
+        if (err.advices) {
+            error("Here is what you can do:")
+            group()
+            err.advices.forEach((advice: string) => {
+                error(`- ${advice}`)
+            })
+            groupEnd()
+        }
+
+        error()
+        error("If can't figure out why this is happening, re-run this command with `-X` switch.")
+        error("If the same error keeps happening, open an issue on Github")
+
+        error()
+        error(`Command exited with errors after ${takenTime}ms`)
+    }
 }
 
-try {
-    command.run(args)
-} catch (err) {
-    console.error("An error occured. Message :")
-    console.error(err)
-}
+main()

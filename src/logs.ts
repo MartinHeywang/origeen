@@ -47,7 +47,7 @@ export function setup(logLevel: LogLevel) {
         groupIndent += "    "
     }
     console.groupEnd = () => {
-        groupIndent = groupIndent.substring(3)
+        groupIndent = groupIndent.substring(4)
     }
 }
 

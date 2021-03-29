@@ -1,6 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import { Arguments } from "yargs"
+import { OrigeenError } from "../commands"
 import { getConfig } from "../config"
 import { h1 } from "../logs"
 import { getProjects, addProject } from "../projects"
@@ -13,8 +14,15 @@ export function execute(args: Arguments) {
     const config = getConfig()
 
     if (args._[1] == undefined) {
-        error(`You did not provide a project name`)
-        return
+        throw new OrigeenError("You need to provide a project name", [
+            "Add a <projectName> after the command name"
+        ])
+    }
+    if(config.workspace == undefined) {
+        throw new OrigeenError("You did not configure your workspace location yet", [
+            "Run 'orgn setup' if you haven't done it yet",
+            "Run 'orgn config workspace --set <pathToWorkspace>"
+        ])
     }
     const pathToProject = path.join(config.workspace, args._[1] as string)
     
@@ -33,7 +41,11 @@ export function execute(args: Arguments) {
     )
     if (alreadyExist) {
         error(`You already used this name for a project. Pick another one !`)
-        return
+        throw new OrigeenError(`You can't create two projects with the name. '${projectName}' is already used.`, [
+            "Choose another name",
+            "Check the spelling",
+            "Delete the existing project"
+        ])
     }
 
     const templateName = (args.template as string) || "empty"
