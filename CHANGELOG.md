@@ -4,7 +4,8 @@
 
 - Improved error handling and log system
 
-- Fixing edge cases on templates
+- Fixed edge cases on templates
+- Removed the ability to create a project in another project
 
 ## **All the versions below are not working :**
 **Even though some of them are published to the npm registry**
