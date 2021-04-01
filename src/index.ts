@@ -52,7 +52,7 @@ async function main() {
         }
 
         error()
-        error("If can't figure out why this is happening, re-run this command with `-X` switch.")
+        error("If you can't figure out why this is happening, re-run this command with the `-X` switch.")
         error("If the same error keeps happening, open an issue on Github")
 
         error()

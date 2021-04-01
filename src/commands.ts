@@ -101,7 +101,7 @@ export const commands: Command[] = [
     {
         name: "delete",
         description: "Deletes a project from the disk",
-        run: async (args) => _delete(args),
+        run: async (args) => await _delete(args),
         usage: "delete <projectName>",
     },
     {

@@ -6,6 +6,8 @@
 
 - Fixed edge cases on templates
 - Removed the ability to create a project in another project
+- Added verification when deleting a project
+- Deleting project recursively (so it works when the project is not empty)
 
 ## **All the versions below are not working :**
 **Even though some of them are published to the npm registry**
