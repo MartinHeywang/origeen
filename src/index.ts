@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { getArgs } from "./args"
-import { executeCommand, OrigeenError } from "./commands"
+import { executeCommand } from "./commands"
 
 import * as paths from "./paths"
 import * as logs from "./logs"

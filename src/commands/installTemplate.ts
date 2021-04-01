@@ -9,7 +9,12 @@ export function execute(args: Arguments) {
 
     h1("Template install")
 
-    const templateName = args._[1]?.toString() ?? ""
+    const templateName = args._[1]?.toString()
+    if(templateName == undefined) {
+        throw new OrigeenError("You need to provide a template name that designate the template you're installing.", [
+            "Specify the template name right after the command name"
+        ]);
+    }
 
     const localPath = (args.local as string) ?? (args.L as string)
     const remoteURL = (args.remote as string) ?? (args.R as string)

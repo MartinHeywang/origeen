@@ -1,6 +1,7 @@
 import { execSync } from "child_process"
 import fs from "fs-extra"
 import path from "path"
+import { OrigeenError } from "./commands"
 import { link } from "./logs"
 
 import { TEMPLATES as pathToTemplates } from "./paths"
@@ -56,22 +57,17 @@ function createTemplateFromLocal(source: string, templateName: string): void {
 function createTemplateFromRemote(source: string, templateName: string): void {
     const { error, debug } = console
 
-    const destination = path.resolve(pathToTemplates, templateName)
+    const destination = path.join(pathToTemplates, templateName)
 
     const command = `git clone "${source}" "${destination}"`
     try {
         debug(`Running "${command}"`)
         execSync(command)
     } catch (err) {
-        error("Ouch!")
-        error(`Origeen tried to run '${command}', but it didn't end properly`)
-        error(`What you may want to do :`)
-        error("  - Check that 'git' is installed on your machine")
-        error(`     - Get it there : ${link("https://git-scm.com/download")}`)
-        error("  - Run the command manually")
-        error("  - Rerun this command with the -X switch")
-        error("  - Open an issue on GitHub")
-        throw new Error("Unkown error while executing commmand")
+        throw new OrigeenError("Unkown error while executing commmand", [
+            "Check that 'git' is installed on your machine",
+            `Make sure that '${templateName}' is not already used for another template`
+        ])
     }
 
     fs.rmdirSync(path.join(destination, ".git"), { recursive: true })

@@ -1,22 +1,20 @@
 import fs from "fs-extra"
-import path from "path"
 
-export const pathToConfig = path.join(process.env.HOME as string, "origeen", "config.json")
-
+import { CONFIG } from "./paths"
 export interface Config {
     [x: string]: string
 }
 
 function* loadConfig() {
-    const {debug} = console
+    const { debug } = console
 
-    const config: Config = fs.readJSONSync(pathToConfig)
+    const config: Config = fs.readJSONSync(CONFIG)
     debug("The config file has been loaded.")
     debug(JSON.stringify(config, undefined, 4))
     debug()
-    debug(`Path: ${pathToConfig}`)
+    debug(`Path: ${CONFIG}`)
     debug()
-    
+
     while (true) {
         yield config
     }
@@ -30,7 +28,7 @@ export function getConfig(): Config {
 }
 
 function setConfig(config: Config): void {
-    fs.writeFileSync(pathToConfig, JSON.stringify(config))
+    fs.writeFileSync(CONFIG, JSON.stringify(config))
     _loadConfig = loadConfig()
 }
 

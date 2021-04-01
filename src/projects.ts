@@ -1,7 +1,6 @@
 import fs from "fs-extra"
-import path from "path"
 
-export const pathToProjects = path.join(process.env.HOME as string, "origeen", "projects.json")
+import {PROJECTS} from "./paths"
 export interface Project {
     name: string
     path: string
@@ -10,7 +9,7 @@ export interface Project {
 let _loadProjects = loadProjects()
 
 function* loadProjects() {
-    const projects = fs.readJSONSync(pathToProjects)
+    const projects = fs.readJSONSync(PROJECTS)
 
     while(true) {
         yield projects
@@ -23,7 +22,7 @@ export function getProjects() {
 }
 
 function setProjects(projects: Project[]): void {
-    fs.writeFileSync(pathToProjects, JSON.stringify(projects))
+    fs.writeFileSync(PROJECTS, JSON.stringify(projects))
     // Re-create the generator to make sure the last version of projects.json is used
     _loadProjects = loadProjects()
 }

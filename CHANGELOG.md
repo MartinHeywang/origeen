@@ -8,6 +8,7 @@
 - Removed the ability to create a project in another project
 - Added verification when deleting a project
 - Deleting project recursively (so it works when the project is not empty)
+- Changed Origeen's home to make it responsive on any OS
 
 ## **All the versions below are not working :**
 **Even though some of them are published to the npm registry**
