@@ -1,6 +1,9 @@
 # Node Modules
 node_modules/**
 
+# VSCode settings
+.vscode
+
 # Built JavaScript
 dist/**
 

@@ -62,6 +62,10 @@ export function h3(message: string) {
     console.log()
 }
 
+export function bash(bash: string, internal = true): string {
+    return `\`${internal && " orgn"} ${bash}\``
+}
+
 export function bashBlock(bash: string, internal = true) {
     console.log()
     console.log(`  $${internal && " orgn"} ${bash}`)
@@ -92,4 +96,15 @@ export async function ask(
             console.warn(message)
         }
     })
+}
+
+export const booleanValidator: ValidatorFunction = (answer: string) => {
+    const answers = ["y", "n", "yes", "no"]
+
+    if (!answers.includes(answer.toLowerCase())) {
+        return `This is not a valid answer. Please type one of: '${answers.join(
+            ", "
+        )}'`
+    }
+    return undefined
 }

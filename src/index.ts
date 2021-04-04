@@ -27,7 +27,7 @@ async function main() {
 
         const takenTime = Date.now() - startTime
         console.log()
-        console.log(`Command executed successfully in ${takenTime}ms`)
+        console.log(`Origeen executed successfully in ${takenTime}ms`)
     } catch (err) {
         const { error, group, groupEnd } = console
 
@@ -53,10 +53,10 @@ async function main() {
 
         error()
         error("If you can't figure out why this is happening, re-run this command with the `-X` switch.")
-        error("If the same error keeps happening, open an issue on Github")
+        error("If the same error keeps happening, open an issue on GitHub")
 
         error()
-        error(`Command exited with errors after ${takenTime}ms`)
+        error(`Origeen exited with errors after ${takenTime}ms`)
     }
 }
 

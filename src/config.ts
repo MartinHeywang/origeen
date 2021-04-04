@@ -1,4 +1,6 @@
 import fs from "fs-extra"
+import { OrigeenError } from "./commands"
+import { bash } from "./logs"
 
 import { CONFIG } from "./paths"
 export interface Config {
@@ -28,12 +30,20 @@ export function getConfig(): Config {
 }
 
 function setConfig(config: Config): void {
-    fs.writeFileSync(CONFIG, JSON.stringify(config))
+    fs.writeFileSync(CONFIG, JSON.stringify(config, undefined, 4))
     _loadConfig = loadConfig()
 }
 
-export function getProperty(property: string) {
-    return getConfig()[property]
+export function getProperty(property: string): string {
+    const value = getConfig()[property]
+    if (value == undefined) {
+        throw new OrigeenError(
+            `Origeen tried to access the config property '${property}'` +
+                `, but its value resolved to undefined.`,
+            [`Set it with: ${bash(`config ${property} --set <newValue>`)}`]
+        )
+    }
+    return value;
 }
 
 export function setProperty(property: string, newValue: string) {

@@ -2,7 +2,7 @@ import { repeat } from "underscore.string"
 import { commands } from "../commands"
 import chalk from "chalk"
 
-import { h1 } from "../logs"
+import { h3 } from "../logs"
 
 
 export function execute() {
@@ -12,11 +12,11 @@ export function execute() {
     log()
     log("Origeen is a CLI-tool that helps you manage all your projects !")
     log()
-    h1("Usage :")
+    h3("Usage :")
     log()
     log("  $ orgn <command> [--flags...]")
     log()
-    h1("Commands :")
+    h3("Commands :")
     log()
     group()
     commands.sort((a, b) => {
@@ -29,10 +29,4 @@ export function execute() {
         log(`${command.name} ${repeat(" ", dashNumber)} ${command.description}`)
     }
     groupEnd()
-    log()
-    log()
-    log("To know more about a specific command, type :")
-    log()
-    log("  $ orgn <command> --help")
-    log()
 }
