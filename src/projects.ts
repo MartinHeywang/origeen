@@ -225,7 +225,7 @@ export function importProject(pathToProject: string) {
         )
     }
 
-    if (!isSubProject(pathToProject)) {
+    if (isSubProject(pathToProject)) {
         throw new OrigeenError(
             `Origeen doesn't support sub-projects\n` +
                 `The given path '${pathToProject}' relates\nsomehow to '${path}' in a unsupported way.\n` +
