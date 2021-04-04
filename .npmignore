@@ -3,7 +3,6 @@
 tsconfig.json
 
 src/**
-!src/**/*.ts
 
 templates/**
 
