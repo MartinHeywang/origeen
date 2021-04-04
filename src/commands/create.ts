@@ -1,6 +1,6 @@
 import { Arguments } from "yargs"
 import { OrigeenError } from "../commands"
-import { getProjects, createProject } from "../projects"
+import { getProjects, createProject, openProject } from "../projects"
 
 export async function execute(args: Arguments) {
     
@@ -14,4 +14,8 @@ export async function execute(args: Arguments) {
     const templateName = (args.template as string) || "@empty"
 
     createProject(projectName, templateName)
+
+    if(args.O || args.open) {
+        openProject(projectName)
+    }
 }

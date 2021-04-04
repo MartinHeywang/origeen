@@ -125,6 +125,19 @@ export function createProject(
     debug(pathToProject)
     debug()
 
+    if (fs.existsSync(pathToProject)) {
+        throw new OrigeenError(
+            "It looks like a folder already exists at:\n" +
+                `${pathToProject}\n` +
+                `\n` +
+                `Did you mean to import it?`,
+            [
+                "Import/register the project into Origeen instead of creating it",
+                "Delete the existing folder",
+            ]
+        )
+    }
+
     if (isSubProject(pathToProject)) {
         throw new OrigeenError(
             `Origeen doesn't support sub-projects\n` +
@@ -188,17 +201,18 @@ export function openProject(projectName: string) {
         )
     }
 
-    project.openings++;
+    project.openings++
     updateProject(project)
 }
 
 export function importProject(pathToProject: string) {
     const { log } = console
-    
-    if(!path.isAbsolute(pathToProject)) {
-        throw new OrigeenError("You need to provide the absolute path to the project you're importing.", [
-            "Re-run the command, but provide an absolute path"
-        ])
+
+    if (!path.isAbsolute(pathToProject)) {
+        throw new OrigeenError(
+            "You need to provide the absolute path to the project you're importing.",
+            ["Re-run the command, but provide an absolute path"]
+        )
     }
 
     if (!fs.existsSync(pathToProject)) {
@@ -211,7 +225,7 @@ export function importProject(pathToProject: string) {
         )
     }
 
-    if(!isSubProject(pathToProject)) {
+    if (!isSubProject(pathToProject)) {
         throw new OrigeenError(
             `Origeen doesn't support sub-projects\n` +
                 `The given path '${pathToProject}' relates\nsomehow to '${path}' in a unsupported way.\n` +
