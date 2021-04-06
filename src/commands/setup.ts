@@ -1,4 +1,3 @@
- 
 import fs from "fs-extra"
 import path from "path"
 
@@ -17,11 +16,29 @@ export async function execute() {
     log()
     log("The next steps will help you configure Origeen as you wish.")
     log("You only have to do it once !")
+
+    // ### NAME
+
+    h3("Name")
+    log(
+        "Your name is and will always be private; it is used as the copyright owner"
+    )
+    log("specified in the LICENSE of each project.")
+
+    const name = await ask("Name? ", (answer) => {
+        if (answer.match(new RegExp(`^[a-zA-Z0-9\\ ]+$`))) return "Your name must be alphanumerical"
+        return undefined
+    })
+
+    setProperty("userName", name)
+
+    // ### WORKSPACE
+
     h3("Workspace")
     log("Your workspace is the place where live all your projects.")
     log("This is the default location used by Origeen when creating a project.")
     log()
-    log("Example : 'Z:/Users/JohnDoe/Code'")
+    log("Example : 'Z:/Users/JohnDoe/Workspace'")
     log()
 
     const workspace = await ask("Workspace location? ", (answer) => {
@@ -31,8 +48,8 @@ export async function execute() {
         const pathToWorkspace = path.resolve(process.cwd(), answer)
         if (!fs.existsSync(pathToWorkspace)) {
             log("The path doesn't exist.")
-            log("Origeen will create it for you !")
             fs.mkdirSync(pathToWorkspace)
+            log("Fortunately, Origeen has just created it for you !")
         }
 
         return undefined
@@ -43,6 +60,9 @@ export async function execute() {
     log("Your workspace is now initialized to :")
     log(workspace)
     log()
+
+    // ### EDITOR
+
     h3("Editor")
     log("Hopefully you have a text editor installed on your computer.")
     log(
