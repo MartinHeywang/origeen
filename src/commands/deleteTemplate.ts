@@ -1,14 +1,15 @@
-import { Arguments } from "yargs"
+ 
+import { positionals } from "../cli"
 import { h1 } from "../logs"
 
 import { remove } from "../templates"
 
-export function execute(args: Arguments) {
+export function execute() {
     const { log } = console
 
     h1("Template removal")
 
-    const templateName = args._[1]?.toString()
+    const templateName = positionals()[0]
     log(`Removing template : ${templateName}`)
 
     remove(templateName)

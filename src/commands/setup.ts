@@ -1,4 +1,4 @@
-import { Arguments } from "yargs"
+ 
 import fs from "fs-extra"
 import path from "path"
 
@@ -6,7 +6,7 @@ import { h1, h3, ask, bashBlock, link } from "../logs"
 
 import { setProperty } from "../config"
 
-export async function execute(args: Arguments) {
+export async function execute() {
     const { clear, log } = console
     clear()
 

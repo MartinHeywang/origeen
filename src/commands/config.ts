@@ -1,23 +1,25 @@
-import { Arguments } from "yargs"
+ 
+import { flags, positionals } from "../cli"
 import { OrigeenError } from "../commands"
 
 import { getConfig, setProperty } from "../config"
 import { h1, h3 } from "../logs"
 
-export function execute(args: Arguments) {
+export function execute() {
     const { log, debug } = console
 
     const config = getConfig()
 
-    const configName = args._[1]?.toString()
+    const configName = positionals()[0]
+    const inputFlags = flags()
+    
     if (configName == undefined) {
         log(JSON.stringify(config, null, 4))
         return
     }
     debug(`Provided config name : '${configName}'`)
 
-    if (args.S == undefined && args.set == undefined) {
-        h3("Read mode")
+    if (inputFlags.set == undefined) {
         debug(`Reading config '${configName}'`)
         if (config[configName] == undefined) {
             log(`Config property '${configName}' is not defined yet`)
@@ -31,7 +33,7 @@ export function execute(args: Arguments) {
     h1("Write mode")
     debug(`Setting config ${configName}`)
 
-    const newValue = (args.S as string) ?? (args.set as string)
+    const newValue = inputFlags.set
     if(typeof newValue !== "string") {
         throw new OrigeenError("You put the '--set' flag, but did not give any value.", [
             "Insert a value after the '--set' flag",

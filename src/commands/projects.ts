@@ -1,8 +1,8 @@
-import { Arguments } from "yargs"
+ 
 import { getProjects } from "../projects"
 import { green } from "chalk"
 
-export function execute(args: Arguments) {
+export function execute() {
     const { log } = console
 
     const projects = getProjects()

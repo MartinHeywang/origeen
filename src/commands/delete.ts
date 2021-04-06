@@ -1,10 +1,11 @@
-import { Arguments } from "yargs"
+ 
+import { positionals } from "../cli"
 import { OrigeenError } from "../commands"
 
 import { deleteProject } from "../projects"
 
-export async function execute(args: Arguments) {
-    const projectName = args._[1]?.toString()
+export async function execute() {
+    const projectName = positionals()[0]
 
     if (projectName == undefined) {
         throw new OrigeenError("You did not provide any project name", [

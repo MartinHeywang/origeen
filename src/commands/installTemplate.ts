@@ -1,23 +1,26 @@
-import { Arguments } from "yargs"
+ 
 import { add } from "../templates"
 
 import { h1 } from "../logs"
 import { OrigeenError } from "../commands"
+import { flags, positionals } from "../cli"
 
-export function execute(args: Arguments) {
+export function execute() {
     const { error, log } = console
+
+    const inputFlags = flags()
 
     h1("Template install")
 
-    const templateName = args._[1]?.toString()
+    const templateName = positionals()[0]
     if(templateName == undefined) {
         throw new OrigeenError("You need to provide a template name that designate the template you're installing.", [
             "Specify the template name right after the command name"
         ]);
     }
 
-    const localPath = (args.local as string) ?? (args.L as string)
-    const remoteURL = (args.remote as string) ?? (args.R as string)
+    const localPath = inputFlags.local
+    const remoteURL = inputFlags.remote
 
     if (localPath) {
         log("Creating template from local path:")

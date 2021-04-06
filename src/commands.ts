@@ -1,5 +1,3 @@
-import { Arguments } from "yargs"
-
 import { execute as setup } from "./commands/setup"
 import { execute as create } from "./commands/create"
 import { execute as open } from "./commands/open"
@@ -9,7 +7,9 @@ import { execute as installTemplate } from "./commands/installTemplate"
 import { execute as deleteTemplate } from "./commands/deleteTemplate"
 import { execute as config } from "./commands/config"
 import { execute as projects } from "./commands/projects"
-import { execute as help } from "./commands/help"
+import { execute as help} from "./commands/help"
+import { positionals } from "./cli"
+import { bash, bashBlock, h3 } from "./logs"
 
 export class OrigeenError extends Error {
     advices
@@ -20,101 +20,268 @@ export class OrigeenError extends Error {
     }
 }
 
-export async function executeCommand(commandName: string, args: Arguments): Promise<void> {
-    const command = commands.find(
-        (cmd) => cmd.name === commandName || cmd.aliases?.includes(commandName)
+export async function executeCommand(commandName: string): Promise<void> {
+    const { debug } = console
+
+    const command = findCommand(commandName)
+
+    debug(`Executing command '${commandName}'`)
+
+    const givenPositionals = positionals()
+    const requiredPositionals = command.positionals.filter(
+        (pos) => pos.required
     )
 
-    if(command == undefined) {
-        throw new OrigeenError(`Unkwown command '${commandName}'`, [
-            "Check the spelling",
-            "Run 'orgn' to list the available commands"
-        ]);
+    debug(
+        `Required positionals : '${requiredPositionals
+            .map((pos) => pos.name)
+            .join("', '")}'`
+    )
+    debug(`Given positionals: '${givenPositionals.join("', '")}'`)
+
+    if (givenPositionals.length < requiredPositionals.length) {
+        throw new OrigeenError(
+            "It looks like you did not enough provide enough positionals to the command in order for it to execute.",
+            [`Type: ${bash(`${commandName} --help`)}`]
+        )
     }
 
-    await command?.run(args)
+    // TODO: Check for required options.
+
+    await command.run()
+}
+
+export function executeHelpCommand(commandName: string): void {
+    const { log, group, groupEnd } = console
+
+    const command = findCommand(commandName)
+
+    const { positionals, options } = command
+
+    const positionalsStr = positionals.reduce((previous, current) => {
+        return previous + (current.required ? `<${current.name}>` : `[${current.name}]`)
+    }, "")
+
+    h3("Usage")
+    bashBlock(`${commandName} ${positionalsStr}`)
+    h3("Description:")
+    log(command.description)
+    h3("Positionals")
+    group()
+    if(positionals.length === 0) console.log("No positionals")
+    positionals.forEach((pos) => {
+        log(`- ${pos.name} : ${pos.desc}`)
+    })
+    groupEnd()
+    h3("Options")
+    group()
+    const optionsKeys = Object.keys(options)
+    if(optionsKeys.length === 0) console.log("No options")
+    optionsKeys.forEach(key => {
+        const prefix = key.length === 1 ? "-" : "--"
+        log(`- '${prefix}${key}' : ${options[key].desc}`)
+    })
+    groupEnd()
+}
+
+function findCommand(commandName: string): Command {
+    const command = commands.find(
+        (cmd) => cmd.name === commandName || cmd.alias.includes(commandName)
+    )
+
+    if (command == undefined) {
+        throw new OrigeenError(`Unknown command '${commandName}'`, [
+            "Check the spelling",
+            "Show the help for Origeen with the '--help' flag",
+        ])
+    }
+
+    return command
 }
 
 export interface Command {
     name: string
     description: string
-    usage: string
+    alias: string[]
 
-    run: (args: Arguments) => Promise<void>
+    positionals: Positional[]
+    options: { [x: string]: Option }
 
-    aliases?: string[]
+    run: () => Promise<void>
+}
+
+export interface Positional {
+    name: string
+    desc: string
+    required: boolean
+}
+
+export interface Option {
+    desc: string
+    alias?: string[]
+    required:
+        | boolean
+        | ((flags: { [x: string]: string | number | boolean }) => boolean)
 }
 
 export const commands: Command[] = [
     {
         name: "setup",
         description: "Launches the origeen setup process",
-        run: async (args) => await setup(args),
+        run: async () => await setup(),
+        alias: [],
 
-        usage: "setup",
+        positionals: [],
+        options: {},
     },
     {
         name: "projects",
         description: "Lists all your projects",
-        run: async (args) => projects(args),
-        usage: "projects",
+        run: async () => projects(),
+        alias: ["p"],
+
+        positionals: [],
+        options: {},
     },
     {
         name: "create",
         description: "Creates a new project",
-        run: async (args) => create(args),
-        aliases: ["c"],
-        usage: "create <projectName>",
+        run: async () => create(),
+        alias: ["new", "c"],
+
+        positionals: [
+            {
+                name: "projectName",
+                desc: "The name of the project that you are creating",
+                required: true,
+            },
+        ],
+        options: {
+            open: {
+                desc: "Whether you want to open the project right after its creation",
+                required: false,
+                alias: ["o"],
+            },
+        },
     },
     {
         name: "open",
         description: "Opens a project with your favourite editor",
-        run: async (args) => open(args),
-        aliases: ["o"],
+        run: async () => open(),
+        alias: ["o"],
 
-        usage: "open <projectName>",
+        positionals: [
+            {
+                name: "projectName",
+                desc: "The name of the project that you want to open",
+                required: true,
+            },
+        ],
+        options: {},
     },
     {
         name: "import",
         description: "Imports an exisiting project into Origeen",
-        run: async (args) => _import(args),
+        run: async () => _import(),
+        alias: [],
 
-        usage: "import <pathToProject>",
+        positionals: [
+            {
+                name: "path",
+                desc: "The absolute path to the project you want to import",
+                required: true,
+            },
+        ],
+        options: {},
     },
     {
         name: "install-template",
         description: "Clones a GitHub repo or a folder to create a template",
-        run: async (args) => installTemplate(args),
-        aliases: ["it"],
+        run: async () => installTemplate(),
+        alias: ["it"],
 
-        usage:
-            "install-template [--local <pathToFolder> | --remote <urlToGitRepo>] [templateName]",
+        positionals: [
+            {
+                name: "templateName",
+                desc: "The name of the template you're installing",
+                required: true,
+            },
+        ],
+        options: {
+            local: {
+                desc: "The absolute path to the folder you are using as a template",
+                required: (flags) => {
+                    return flags.remote == undefined
+                },
+            },
+            remote: {
+                desc: "The url to the remote Git repo you are using as a template",
+                required: (flags) => {
+                    return flags.local == undefined
+                },
+            },
+        },
     },
     {
         name: "delete-template",
         description: "Deletes a previously installed template",
-        run: async (args) => deleteTemplate(args),
-        aliases: ["dt"],
+        run: async () => deleteTemplate(),
+        alias: ["dt"],
 
-        usage: "delete-template <templateName>",
+        positionals: [
+            {
+                name: "templateName",
+                desc: "The name of the template you're deleting",
+                required: true,
+            },
+        ],
+        options: {},
     },
     {
         name: "delete",
         description: "Deletes a project from the disk",
-        run: async (args) => await _delete(args),
-        usage: "delete <projectName>",
+        run: async () => await _delete(),
+        alias: [],
+
+        positionals: [
+            {
+                name: "projectName",
+                desc: "The name of the project you are deleting",
+                required: true,
+            },
+        ],
+        options: {},
     },
     {
         name: "config",
         description: "Get/Set values in the config file",
-        run: async (args) => config(args),
-        usage: "config [configName [--set <newConfigValue>] ]",
+        run: async () => config(),
+        alias: [],
+
+        positionals: [
+            {
+                name: "configName",
+                desc: "The name of the config you want to get the value",
+                required: false
+            }
+        ],
+        options: {
+            set: {
+                desc: "The new value for the property. Has an effect only if you provide a config name.",
+                required: (flags) => {
+                    return flags.get == undefined
+                },
+                alias: ["s"],
+            },
+        },
     },
     {
         name: "help",
-        usage: "help",
-        description: "Shows the help for orgn",
+        description: "See the generic help for Origeen",
         run: async () => help(),
-        aliases: ["h"],
-    },
+        alias: ["h"],
+
+        positionals: [],
+        options: {}
+    }
 ]

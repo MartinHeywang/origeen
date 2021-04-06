@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { getArgs } from "./args"
-import { executeCommand } from "./commands"
+import { commandName, flags } from "./cli"
+import { executeCommand, executeHelpCommand } from "./commands"
 
 import * as paths from "./paths"
 import * as logs from "./logs"
@@ -12,20 +12,20 @@ async function main() {
     const startTime = Date.now()
 
     // Configure logs
-    const args = getArgs()
-    if (args.X || args["debug"]) logs.setup(logs.LogLevel.DEBUG)
-    else if (args.E || args["error-only"]) logs.setup(logs.LogLevel.ERROR)
-    else if (args.W || args["warning-only"]) logs.setup(logs.LogLevel.WARNING)
+    const inputFlags = flags()
+    if (inputFlags.debug) logs.setup(logs.LogLevel.DEBUG)
+    else if (inputFlags.warningOnly) logs.setup(logs.LogLevel.WARNING)
+    else if (inputFlags.errorOnly) logs.setup(logs.LogLevel.ERROR)
     else logs.setup(logs.LogLevel.INFO)
 
     paths.ensure()
 
-    const commandName = args._[0]?.toString() ?? "help"
-
     try {
-        await executeCommand(commandName, args)
+        if(inputFlags.help) executeHelpCommand(commandName())
+        else await executeCommand(commandName())
 
         const takenTime = Date.now() - startTime
+        
         console.log()
         console.log(`Origeen executed successfully in ${takenTime}ms`)
     } catch (err) {
