@@ -9,6 +9,7 @@ import { execFileSync } from "child_process"
 export interface Project {
     name: string
     path: string
+    license?: string
 
     createdAt?: number
     importedAt?: number
@@ -91,9 +92,20 @@ function isSubProject(pathToProject: string) {
     return false
 }
 
+function isSupportedLicense(licenseName: string) {
+    if (licenseName.startsWith("@")) {
+        return false
+    }
+    const exists = fs.existsSync(
+        path.join(__dirname, "..", "licenses", `${licenseName}.md`)
+    )
+    return exists
+}
+
 export function createProject(
     projectName: string,
-    templateName = EMPTY_TEMPLATE
+    templateName = EMPTY_TEMPLATE,
+    licenseName = "MIT"
 ) {
     const { debug, log } = console
 
@@ -151,6 +163,16 @@ export function createProject(
         )
     }
 
+    if (!isSupportedLicense(licenseName)) {
+        throw new OrigeenError(
+            `The name of the license you gave is not supported by Origeen`,
+            [
+                "Choose another license",
+                `Wait for the '${licenseName}' license to be added. (you should open an issue in this case)`,
+            ]
+        )
+    }
+
     const templatePath = path.join(TEMPLATES, templateName)
     debug("Absolute path to template:")
     debug(templatePath)
@@ -161,6 +183,13 @@ export function createProject(
     debug(`Copied!`)
     debug()
 
+    debug(`Copying license to project root`)
+    const pathToLicense = path.join(__dirname, "..", "licenses", `${licenseName}.md`)
+    fs.copySync(pathToLicense, path.join(pathToProject, "LICENSE"), {
+        overwrite: true, // overwrite the License of the template
+    })
+    debug("Done!")
+
     debug(`Adding new project to 'projects.json'`)
     addProject({
         name: projectName,
@@ -169,6 +198,7 @@ export function createProject(
         importedAt: -1,
         lastOpenedAt: -1,
         openings: 0,
+        license: licenseName,
     })
     debug(`Added!`)
     debug()
@@ -202,6 +232,7 @@ export function openProject(projectName: string) {
     }
 
     project.openings++
+    project.lastOpenedAt = Date.now()
     updateProject(project)
 }
 

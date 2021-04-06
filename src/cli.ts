@@ -66,6 +66,11 @@ const cli = meow({
             default: false,
             required: false
         },
+        license: {
+            type: "string",
+            default: "ISC",
+            required: false
+        },
 
         // config
         set: {

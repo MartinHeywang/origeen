@@ -162,6 +162,10 @@ export const commands: Command[] = [
                 required: false,
                 alias: ["o"],
             },
+            license: {
+                desc: "The name of the LICENSE you want to add",
+                required: false,
+            },
         },
     },
     {
