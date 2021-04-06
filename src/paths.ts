@@ -15,6 +15,8 @@ export const PROJECTS = path.join(HOME, "projects.json")
 export const TEMPLATES = path.join(HOME, "templates")
 export const EMPTY_TEMPLATE = path.join(TEMPLATES, "@empty")
 
+export const LICENSES = path.join(__dirname, "..", "licenses")
+
 /**
  * Ensures that all the exported constants points to an existing and valid file/directory
  */

@@ -1,11 +1,12 @@
 import fs from "fs-extra"
 import path from "path"
-import { getProperty } from "./config"
+import { getConfig, getProperty } from "./config"
 
-import { EMPTY_TEMPLATE, PROJECTS, TEMPLATES } from "./paths"
+import { EMPTY_TEMPLATE, LICENSES, PROJECTS, TEMPLATES } from "./paths"
 import { OrigeenError } from "./commands"
 import { ask, bash, booleanValidator } from "./logs"
 import { execFileSync } from "child_process"
+import { replaceVariable } from "./licenses"
 export interface Project {
     name: string
     path: string
@@ -105,7 +106,7 @@ function isSupportedLicense(licenseName: string) {
 export function createProject(
     projectName: string,
     templateName = EMPTY_TEMPLATE,
-    licenseName = "MIT"
+    licenseName = "ISC"
 ) {
     const { debug, log } = console
 
@@ -184,10 +185,14 @@ export function createProject(
     debug()
 
     debug(`Copying license to project root`)
-    const pathToLicense = path.join(__dirname, "..", "licenses", `${licenseName}.md`)
-    fs.copySync(pathToLicense, path.join(pathToProject, "LICENSE"), {
-        overwrite: true, // overwrite the License of the template
-    })
+
+    const name = getConfig().userName;
+    let license = fs.readFileSync(path.join(LICENSES, `${licenseName}.md`), "utf-8")
+    license = replaceVariable("name", name, license);
+    license = replaceVariable("year", new Date().getFullYear().toString(), license);
+
+    fs.writeFileSync(path.join(pathToProject, `LICENSE`), license);
+
     debug("Done!")
 
     debug(`Adding new project to 'projects.json'`)
