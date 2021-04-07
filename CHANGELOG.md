@@ -1,5 +1,11 @@
 # Origeen's changelog
 
+### v0.4.0
+
+- Added the LICENSE feature : add a license directly when creating a project.
+
+- Rewrote and optimized some files
+
 ### v0.3.4
 
 - Improved error handling and log system
