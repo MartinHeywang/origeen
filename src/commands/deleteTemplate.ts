@@ -1,10 +1,26 @@
- 
 import { positionals } from "../cli"
-import { h1 } from "../logs"
+import { Command } from "../commandUtils"
 
-import { remove } from "../templates"
+import { h1 } from "../logUtils"
+import { remove } from "../templateUtils"
 
-export function execute() {
+const descriptor: Command = {
+    name: "delete-template",
+    description: "Deletes a previously installed template",
+    run: async () => execute(),
+    alias: ["dt"],
+
+    positionals: [
+        {
+            name: "templateName",
+            desc: "The name of the template you're deleting",
+            required: true,
+        },
+    ],
+    options: {},
+}
+
+function execute() {
     const { log } = console
 
     h1("Template removal")
@@ -16,3 +32,5 @@ export function execute() {
 
     log("Done successfully!")
 }
+
+export default { descriptor }

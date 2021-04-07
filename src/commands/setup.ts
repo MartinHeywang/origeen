@@ -1,11 +1,22 @@
 import fs from "fs-extra"
 import path from "path"
 
-import { h1, h3, ask, bashBlock, link } from "../logs"
+import { h1, h3, ask, bashBlock, link } from "../logUtils"
 
-import { setProperty } from "../config"
+import { setProperty } from "../configUtils"
+import { Command } from "../commandUtils"
 
-export async function execute() {
+export const descriptor: Command = {
+    name: "setup",
+    description: "Launches the origeen setup process",
+    run: async () => await execute(),
+    alias: [],
+
+    positionals: [],
+    options: {},
+}
+
+async function execute() {
     const { clear, log } = console
     clear()
 
@@ -26,7 +37,8 @@ export async function execute() {
     log("specified in the LICENSE of each project.")
 
     const name = await ask("Name? ", (answer) => {
-        if (answer.match(new RegExp(`^[a-zA-Z0-9\\ ]+$`))) return "Your name must be alphanumerical"
+        if (answer.match(new RegExp(`^[a-zA-Z0-9\\ ]+$`)))
+            return "Your name must be alphanumerical"
         return undefined
     })
 
@@ -94,3 +106,5 @@ export async function execute() {
     log("And by the way, report issues at :")
     log(link("https://github.com/MartinHeywang/origeen/issues/new/choose"))
 }
+
+export default { descriptor }

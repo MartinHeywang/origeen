@@ -1,6 +1,6 @@
 import meow from "meow"
-import { OrigeenError } from "./commands"
-import { bash } from "./logs"
+import { OrigeenError } from "./errors"
+import { bash } from "./logUtils"
 
 export function commandName() {
     if (cli.input[0] == undefined) {

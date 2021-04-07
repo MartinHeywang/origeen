@@ -1,9 +1,18 @@
 import { repeat } from "underscore.string"
-import { commands } from "../commands"
+import { Command, commands } from "../commandUtils"
 import chalk from "chalk"
 
-import { h3 } from "../logs"
+import { h3 } from "../logUtils"
 
+const descriptor: Command = {
+    name: "help",
+    description: "See the generic help for Origeen",
+    run: async () => execute(),
+    alias: ["h"],
+
+    positionals: [],
+    options: {},
+}
 
 export function execute() {
     const { log, group, groupEnd } = console
@@ -30,3 +39,5 @@ export function execute() {
     }
     groupEnd()
 }
+
+export default { descriptor }

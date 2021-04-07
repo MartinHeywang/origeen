@@ -1,8 +1,18 @@
- 
-import { getProjects } from "../projects"
+import { getProjects } from "../projectUtils"
 import { green } from "chalk"
+import { Command } from "../commandUtils"
 
-export function execute() {
+const descriptor: Command = {
+    name: "projects",
+    description: "Lists all your projects",
+    run: async () => execute(),
+    alias: ["p"],
+
+    positionals: [],
+    options: {},
+}
+
+function execute() {
     const { log } = console
 
     const projects = getProjects()
@@ -22,3 +32,5 @@ export function execute() {
         log(`${project.name} --- ${project.path}`)
     }
 }
+
+export default { descriptor }

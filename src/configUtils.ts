@@ -1,6 +1,6 @@
 import fs from "fs-extra"
-import { OrigeenError } from "./commands"
-import { bash } from "./logs"
+import { OrigeenError } from "./errors"
+import { bash } from "./logUtils"
 
 import { CONFIG } from "./paths"
 export interface Config {

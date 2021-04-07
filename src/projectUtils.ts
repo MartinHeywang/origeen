@@ -1,10 +1,10 @@
 import fs from "fs-extra"
 import path from "path"
-import { getConfig, getProperty } from "./config"
+import { getConfig, getProperty } from "./configUtils"
 
 import { EMPTY_TEMPLATE, LICENSES, PROJECTS, TEMPLATES } from "./paths"
-import { OrigeenError } from "./commands"
-import { ask, bash, booleanValidator } from "./logs"
+import { OrigeenError } from "./errors"
+import { ask, bash, booleanValidator } from "./logUtils"
 import { execFileSync } from "child_process"
 import { replaceVariable } from "./licenses"
 export interface Project {

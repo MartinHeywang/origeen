@@ -1,12 +1,38 @@
- 
 import { flags, positionals } from "../cli"
-import { OrigeenError } from "../commands"
-import { getProjects, createProject, openProject } from "../projects"
+import { Command } from "../commandUtils"
+import { OrigeenError } from "../errors"
+import { createProject, openProject } from "../projectUtils"
 
-export async function execute() {
+const descriptor: Command = {
+    name: "create",
+    description: "Creates a new project",
+    run: async () => execute(),
+    alias: ["new", "c"],
 
+    positionals: [
+        {
+            name: "projectName",
+            desc: "The name of the project that you are creating",
+            required: true,
+        },
+    ],
+    options: {
+        open: {
+            desc:
+                "Whether you want to open the project right after its creation",
+            required: false,
+            alias: ["o"],
+        },
+        license: {
+            desc: "The name of the LICENSE you want to add",
+            required: false,
+        },
+    },
+}
+
+async function execute() {
     const inputFlags = flags()
-    
+
     const projectName = positionals()[0]
     if (projectName == undefined) {
         throw new OrigeenError("You need to provide a project name", [
@@ -19,7 +45,9 @@ export async function execute() {
 
     createProject(projectName, templateName, licenseName)
 
-    if(inputFlags.open) {
+    if (inputFlags.open) {
         openProject(projectName)
     }
 }
+
+export default { descriptor }

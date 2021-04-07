@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { commandName, flags } from "./cli"
-import { executeCommand, executeHelpCommand } from "./commands"
+import { executeCommand, executeHelpCommand } from "./commandUtils"
 
 import * as paths from "./paths"
-import * as logs from "./logs"
+import * as logs from "./logUtils"
 
 // Skip a line for white space :)
 console.log()

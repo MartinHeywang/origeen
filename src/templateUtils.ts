@@ -1,8 +1,8 @@
 import { execSync } from "child_process"
 import fs from "fs-extra"
 import path from "path"
-import { OrigeenError } from "./commands"
-import { link } from "./logs"
+import { OrigeenError } from "./errors"
+import { link } from "./logUtils"
 
 import { TEMPLATES as pathToTemplates } from "./paths"
 
