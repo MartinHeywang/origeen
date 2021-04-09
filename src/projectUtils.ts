@@ -7,6 +7,7 @@ import { OrigeenError } from "./errors"
 import { ask, bash, booleanValidator } from "./logUtils"
 import { execFileSync } from "child_process"
 import { replaceVariable } from "./licenses"
+import { checkBashRequirements } from "./templateUtils"
 export interface Project {
     name: string
     path: string
@@ -58,12 +59,14 @@ export function getProjects() {
 }
 
 export function projectExists(projectName: string) {
+    console.log("Checking if the project already exists...")
     return getProjects().some((project) => project.name === projectName)
 }
 
 export function isValidName(projectName: string): boolean {
     const regex = new RegExp(`^[a-zA-Z0-9_\\.\\-]+$`)
 
+    console.log("Checking project name...")
     if (!projectName.match(regex)) return false
     return true
 }
@@ -138,6 +141,7 @@ export function createProject(
     debug(pathToProject)
     debug()
 
+    console.log("Checking if the folder already exists...")
     if (fs.existsSync(pathToProject)) {
         throw new OrigeenError(
             "It looks like a folder already exists at:\n" +
@@ -151,6 +155,7 @@ export function createProject(
         )
     }
 
+    console.log("Checking for possible sub-projects...")
     if (isSubProject(pathToProject)) {
         throw new OrigeenError(
             `Origeen doesn't support sub-projects\n` +
@@ -164,6 +169,7 @@ export function createProject(
         )
     }
 
+    console.log("Checking if the license is supported...")
     if (!isSupportedLicense(licenseName)) {
         throw new OrigeenError(
             `The name of the license you gave is not supported by Origeen`,
@@ -174,10 +180,15 @@ export function createProject(
         )
     }
 
+    console.log("Checks all passed successfully!")
+    console.log()
+
     const templatePath = path.join(TEMPLATES, templateName)
     debug("Absolute path to template:")
     debug(templatePath)
     debug()
+
+    checkBashRequirements(templateName)
 
     debug(`Copying template to the project destination`)
     fs.copySync(templatePath, pathToProject)

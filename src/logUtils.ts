@@ -63,7 +63,8 @@ export function h3(message: string) {
 }
 
 export function bash(bash: string, internal = true): string {
-    return `\`${internal && "orgn"} ${bash}\``
+    if(internal) return `\`orgn ${bash}\``
+    return `\`${bash}\``
 }
 
 export function bashBlock(bash: string, internal = true) {

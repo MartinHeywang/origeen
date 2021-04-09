@@ -2,9 +2,9 @@ import { execSync } from "child_process"
 import fs from "fs-extra"
 import path from "path"
 import { OrigeenError } from "./errors"
-import { link } from "./logUtils"
+import { bash } from "./logUtils"
 
-import { TEMPLATES as pathToTemplates } from "./paths"
+import { TEMPLATES as pathToTemplates, TEMPLATES } from "./paths"
 
 export function add(
     templateName: string,
@@ -55,7 +55,7 @@ function createTemplateFromLocal(source: string, templateName: string): void {
 }
 
 function createTemplateFromRemote(source: string, templateName: string): void {
-    const { error, debug } = console
+    const { debug } = console
 
     const destination = path.join(pathToTemplates, templateName)
 
@@ -66,7 +66,7 @@ function createTemplateFromRemote(source: string, templateName: string): void {
     } catch (err) {
         throw new OrigeenError("Unkown error while executing commmand", [
             "Check that 'git' is installed on your machine",
-            `Make sure that '${templateName}' is not already used for another template`
+            `Make sure that '${templateName}' is not already used for another template`,
         ])
     }
 
@@ -84,7 +84,7 @@ export function remove(templateName: string): void {
     }
 
     const pathToTemplate = path.join(pathToTemplates, templateName)
-    if(!fs.existsSync(pathToTemplate)) {
+    if (!fs.existsSync(pathToTemplate)) {
         error("The given template name was not found.")
         error("Make sure you spelled it properly")
         error()
@@ -101,14 +101,39 @@ function isReservedName(name: string): boolean {
     return false
 }
 
-/**
- * Validates a name to apply to a template
- *
- * @param name the name to validate
- * @returns an error message (string) if the name is not valid, otherwiser false
- */
-function isValidName(name: string): boolean {
-    const regex = new RegExp(`^[a-zA-Z0-9]+$`)
-    if (name.match(regex)) return false
-    return true
+export function getTemplateLocation(templateName: string) {
+    return path.join(TEMPLATES, templateName)
+}
+
+export function checkBashRequirements(templateName: string) {
+    const file = fs.readFileSync(
+        path.join(TEMPLATES, templateName, "bashRequirements.txt"),
+        { encoding: "utf-8" }
+    )
+    const lines = file.split(/\r?\n/) || ""
+
+    lines.forEach((line) => {
+        if (!line || line.startsWith("#") || line === "") return
+
+        const word = line.split(" ")[0]
+
+        try {
+            execSync(line)
+        } catch (err) {
+            throw new OrigeenError(
+                "The template you are using requires that some cli utilities are installed.\n" +
+                    `Origeen tried to run ${bash(
+                        line,
+                        false
+                    )} but it didn't work.\n\nIt looks like you are missing a requirement.`,
+                [
+                    `Run ${bash(line, false)} manually`,
+                    `Install ${bash(
+                        word,
+                        false
+                    )} and make sure to restart the terminal`,
+                ]
+            )
+        }
+    })
 }
