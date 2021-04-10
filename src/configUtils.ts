@@ -24,6 +24,11 @@ function* loadConfig() {
 
 let _loadConfig = loadConfig()
 
+/**
+ * Returns the config file
+ * 
+ * @returns the config file as an Object
+ */
 export function getConfig(): Config {
     // We know the generator won't return void
     return _loadConfig.next().value as Config
@@ -34,6 +39,12 @@ function setConfig(config: Config): void {
     _loadConfig = loadConfig()
 }
 
+/**
+ * Returns the value of a given property
+ * 
+ * @param property the name of a property
+ * @returns the value of the property
+ */
 export function getProperty(property: string): string {
     const value = getConfig()[property]
     if (value == undefined) {
@@ -46,6 +57,9 @@ export function getProperty(property: string): string {
     return value;
 }
 
+/**
+ * Sets the property in the config file.
+ */
 export function setProperty(property: string, newValue: string) {
     const config = getConfig()
 

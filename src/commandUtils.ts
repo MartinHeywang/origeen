@@ -54,6 +54,11 @@ export const commands: Command[] = [
     helpCommand.descriptor,
 ]
 
+/**
+ * Executes a command based on its name
+ * 
+ * @param commandName the name of the command
+ */
 export async function executeCommand(commandName: string): Promise<void> {
     const { debug } = console
 
@@ -64,6 +69,12 @@ export async function executeCommand(commandName: string): Promise<void> {
     await command.run()
 }
 
+
+/**
+ * Outputs the help version of the given command
+ * 
+ * @param commandName the name of the command
+ */
 export function executeHelpCommand(commandName: string): void {
     const { log, group, groupEnd } = console
 
@@ -100,6 +111,13 @@ export function executeHelpCommand(commandName: string): void {
     groupEnd()
 }
 
+/**
+ * Searches for a command and returns it if it finds one. Otherwise, throws an error.
+ * 
+ * @param commandName the name of the command
+ * @returns the command descriptor
+ * @throws {OrigeenError} if the command was not found
+ */
 function findCommand(commandName: string): Command {
     const command = commands.find(
         (cmd) => cmd.name === commandName || cmd.alias.includes(commandName)

@@ -6,6 +6,16 @@ import { bash } from "./logUtils"
 
 import { TEMPLATES as pathToTemplates, TEMPLATES } from "./paths"
 
+/**
+ * Adds (registers) a template.
+ * Copies the content of the pointing folder/git repo
+ * into the template directory.
+ *
+ * @param templateName the name of the template to add
+ * @param pathOrUrl a path if remote is false, an url if remote is true
+ * @param remote whether the second argument is an url or a path
+ * @returns {void}
+ */
 export function add(
     templateName: string,
     pathOrUrl: string,
@@ -24,6 +34,13 @@ export function add(
     createTemplateFromLocal(pathOrUrl, templateName)
 }
 
+/**
+ * Creates a template from a local path, 
+ * copies the content of the folder in the templates directory
+ *
+ * @param source the path to a local folder
+ * @param templateName the name of the new template
+ */
 function createTemplateFromLocal(source: string, templateName: string): void {
     const { debug, error } = console
 
@@ -54,6 +71,13 @@ function createTemplateFromLocal(source: string, templateName: string): void {
     fs.copySync(source, destination)
 }
 
+/**
+ * Creates a template from a remote git repo.
+ * Clones the git repo to the templates directory.
+ * 
+ * @param source the url to a git repo
+ * @param templateName the name of the new template
+ */
 function createTemplateFromRemote(source: string, templateName: string): void {
     const { debug } = console
 
@@ -73,6 +97,11 @@ function createTemplateFromRemote(source: string, templateName: string): void {
     fs.rmdirSync(path.join(destination, ".git"), { recursive: true })
 }
 
+/**
+ * Deletes a template from Origeen.
+ * 
+ * @param templateName the name of the template to remove
+ */
 export function remove(templateName: string): void {
     const { error, debug } = console
 
@@ -96,22 +125,41 @@ export function remove(templateName: string): void {
     fs.rmdirSync(pathToTemplate, { recursive: true })
 }
 
+/**
+ * Checks if the given name is suitable for a template name
+ * 
+ * @param name the name to check
+ * @returns true if the name is valid, otherwise false
+ */
 function isReservedName(name: string): boolean {
     if (name.startsWith("@")) return true
     return false
 }
 
+/**
+ * Returns the path to a template
+ * 
+ * @param templateName the name of the template
+ * @returns the location of the template
+ */
 export function getTemplateLocation(templateName: string) {
     return path.join(TEMPLATES, templateName)
 }
 
+/**
+ * Checks for the bash requirements of a template.
+ * Executes the command(s) defined in '<templateRoot>/bashRequirements.txt'
+ * 
+ * @param templateName the name of the template
+ */
 export function checkBashRequirements(templateName: string) {
-    const file = fs.readFileSync(
+   try {
+        const file = fs.readFileSync(
         path.join(TEMPLATES, templateName, "bashRequirements.txt"),
         { encoding: "utf-8" }
     )
     const lines = file.split(/\r?\n/) || ""
-
+    
     lines.forEach((line) => {
         if (!line || line.startsWith("#") || line === "") return
 
@@ -133,7 +181,11 @@ export function checkBashRequirements(templateName: string) {
                         false
                     )} and make sure to restart the terminal`,
                 ]
-            )
-        }
-    })
+                )
+            }
+        })
+    } catch (err) {
+        // the file doesn't exist, no requirements
+        return;
+    }
 }
