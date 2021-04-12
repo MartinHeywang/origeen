@@ -9,16 +9,13 @@ It is a simple and intuitive tool, that works with projects of any scale. Its si
 
 ## Features
 
-- Create/import/delete projects from your CLI
-- Open projects with your favourite editor
-- Use templates to create projects with basic files; skip the boring configuration steps.
-- Avoid unnecessary `cd`(s)
-- Easy-to-understand errors.
-
-*Upcoming features:*
-- Create a project with a license of your choice
-- Create a git repo for your project and its remote on GitHub.
-- ...
+- Create/import/delete projects from your CLI,
+- Open projects with your favourite editor,
+- Use templates to create projects with basic files; skip the boring configuration steps,
+- Avoid unnecessary `cd`(s),
+- Easy-to-understand errors,
+- Create a project with a license of your choice,
+- Create a git repo for your project.
 
 ## Get Started
 
@@ -27,7 +24,7 @@ It is a simple and intuitive tool, that works with projects of any scale. Its si
 $ npm install origeen --global
 $ orgn setup
 
-$ orgn create my-fancy-project --open
+$ orgn new my-fancy-project --open
 # or
 $ orgn import X:/JohnDoe/.../project-name
 ```

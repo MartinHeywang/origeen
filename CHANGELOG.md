@@ -1,11 +1,20 @@
 # Origeen's changelog
 
+### v0.5.0
+
+- Added the "git repo" feature : creates a git repo for each project.
+
+- Optimization
+
+---
+
 ### v0.4.0
 
 - Added the LICENSE feature : add a license directly when creating a project.
 
 - Rewrote and optimized some files
 
+---
 ### v0.3.4
 
 - Improved error handling and log system
@@ -16,6 +25,7 @@
 - Deleting project recursively (so it works when the project is not empty)
 - Changed Origeen's home to make it responsive on any OS
 
+---
 ## **All the versions below are not working :**
 **Even though some of them are published to the npm registry**
 
