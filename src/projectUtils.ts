@@ -8,6 +8,7 @@ import { ask, bash, booleanValidator } from "./logUtils"
 import { execFileSync } from "child_process"
 import { replaceVariable } from "./licenses"
 import { checkBashRequirements } from "./templateUtils"
+import { execSync } from "child_process"
 
 /**
  * The Project interface defines a project, as considered by Origeen.
@@ -262,6 +263,8 @@ export function createProject(
         )
     }
 
+    console.log("Checking bash requirements...")
+    checkBashRequirements(templateName)
     console.log("Checks all passed successfully!")
     console.log()
 
@@ -269,8 +272,6 @@ export function createProject(
     debug("Absolute path to template:")
     debug(templatePath)
     debug()
-
-    checkBashRequirements(templateName)
 
     debug(`Copying template to the project destination`)
     fs.copySync(templatePath, pathToProject)
@@ -307,6 +308,8 @@ export function createProject(
     })
     debug(`Added!`)
     debug()
+
+    execSync("git init", { cwd: pathToProject })
 }
 
 /**
@@ -402,7 +405,7 @@ export function importProject(pathToProject: string) {
 }
 
 /**
- * Deletes a project, its folder recursively, 
+ * Deletes a project, its folder recursively,
  * and unregisters it from Origeen.
  *
  * @param projectName the name of the project
