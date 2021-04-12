@@ -147,6 +147,15 @@ export function getTemplateLocation(templateName: string) {
 }
 
 /**
+ * Returns whether the given template exists
+ * 
+ * @param templateName the name of a template
+ */
+export function templateExists(templateName: string): boolean {
+    return fs.existsSync(getTemplateLocation(templateName))
+}
+
+/**
  * Checks for the bash requirements of a template.
  * Executes the command(s) defined in '<templateRoot>/bashRequirements.txt'
  * 

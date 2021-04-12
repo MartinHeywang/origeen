@@ -71,6 +71,11 @@ const cli = meow({
             default: "ISC",
             required: false
         },
+        noGit: {
+            type: "boolean",
+            default: false,
+            required: false
+        },
 
         // config
         set: {

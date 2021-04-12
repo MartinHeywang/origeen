@@ -43,7 +43,7 @@ async function execute() {
     const templateName = (inputFlags.template as string) || "@empty"
     const licenseName = inputFlags.license
 
-    createProject(projectName, templateName, licenseName)
+    createProject(projectName, templateName, licenseName, !inputFlags.noGit)
 
     if (inputFlags.open) {
         openProject(projectName)

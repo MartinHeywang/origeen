@@ -7,7 +7,11 @@ import { OrigeenError } from "./errors"
 import { ask, bash, booleanValidator } from "./logUtils"
 import { execFileSync } from "child_process"
 import { replaceVariable } from "./licenses"
-import { checkBashRequirements } from "./templateUtils"
+import {
+    checkBashRequirements,
+    getTemplateLocation,
+    templateExists,
+} from "./templateUtils"
 import { execSync } from "child_process"
 
 /**
@@ -145,6 +149,10 @@ export function getProject(projectName: string): Project {
     return project
 }
 
+export function getPathToProject(projectName: string) {
+    return getProject(projectName).path
+}
+
 /**
  * Returns whether a path could be a subproject of an existing project.
  * If this call evaluates to <code>true</code>, it may mean that :
@@ -181,6 +189,19 @@ function isSupportedLicense(licenseName: string) {
 }
 
 /**
+ * Returnd whether the given path points to a non-existent or empty directory
+ *
+ * @param pathToFolder a path to a folder
+ * @returns true if the path either doesn't exist or is empty
+ */
+function isNanOrEmptyDirectory(pathToFolder: string): boolean {
+    if (!fs.existsSync(pathToFolder)) return true
+    if (!fs.statSync(pathToFolder).isDirectory()) return false
+    if (fs.readdirSync(pathToFolder).length !== 0) return false
+    return true
+}
+
+/**
  * Creates a project, its folder, and registers it in Origeen.
  * If only one argument is provided, will create an empty
  * project with the ISC License in it.
@@ -192,9 +213,10 @@ function isSupportedLicense(licenseName: string) {
 export function createProject(
     projectName: string,
     templateName = EMPTY_TEMPLATE,
-    licenseName = "ISC"
+    licenseName = "ISC",
+    git?: boolean
 ) {
-    const { debug, log } = console
+    const { debug, log, warn } = console
 
     log("Creating a project")
     log()
@@ -224,13 +246,13 @@ export function createProject(
     debug(pathToProject)
     debug()
 
-    console.log("Checking if the folder already exists...")
-    if (fs.existsSync(pathToProject)) {
+    log("Checking if the folder already exists...")
+    if (!isNanOrEmptyDirectory(pathToProject)) {
         throw new OrigeenError(
-            "It looks like a folder already exists at:\n" +
+            "It looks like a non-empty folder already exists at:\n" +
                 `${pathToProject}\n` +
                 `\n` +
-                `Did you mean to import it?`,
+                `Did you mean to import this folder as a project?`,
             [
                 "Import/register the project into Origeen instead of creating it",
                 "Delete the existing folder",
@@ -238,7 +260,7 @@ export function createProject(
         )
     }
 
-    console.log("Checking for possible sub-projects...")
+    log("Checking for possible sub-projects...")
     if (isSubProject(pathToProject)) {
         throw new OrigeenError(
             `Origeen doesn't support sub-projects\n` +
@@ -252,49 +274,40 @@ export function createProject(
         )
     }
 
-    console.log("Checking if the license is supported...")
-    if (!isSupportedLicense(licenseName)) {
-        throw new OrigeenError(
-            `The name of the license you gave is not supported by Origeen`,
-            [
-                "Choose another license",
-                `Wait for the '${licenseName}' license to be added. (you should open an issue in this case)`,
-            ]
-        )
+    log("Checking bash requirements...")
+    checkBashRequirements(templateName)
+
+    log("Checking for template existence...")
+    if (!templateExists(templateName)) {
+        throw new OrigeenError("The given template name isn't valid.", [
+            "Check the spelling",
+            `Make sure you installed a template named: '${templateName}'`,
+        ])
     }
 
-    console.log("Checking bash requirements...")
-    checkBashRequirements(templateName)
-    console.log("Checks all passed successfully!")
-    console.log()
+    log("Checking if the license is valid...")
+    if(!isSupportedLicense(licenseName)) {
+        throw new OrigeenError("The provided license is not supported yet.", [
+            "Check the spelling",
+            "Choose another license",
+            `Request '${licenseName}' to be added on GitHub.`
+        ])
+    }
 
-    const templatePath = path.join(TEMPLATES, templateName)
+    log()
+    log("Checks all passed successfully :)")
+    log()
+
+    const templatePath = getTemplateLocation(templateName)
     debug("Absolute path to template:")
     debug(templatePath)
     debug()
 
+    log("Creating project...")
     debug(`Copying template to the project destination`)
-    fs.copySync(templatePath, pathToProject)
+    fs.copySync(templatePath, pathToProject, { overwrite: true })
     debug(`Copied!`)
     debug()
-
-    debug(`Copying license to project root`)
-
-    const name = getConfig().userName
-    let license = fs.readFileSync(
-        path.join(LICENSES, `${licenseName}.md`),
-        "utf-8"
-    )
-    license = replaceVariable("name", name, license)
-    license = replaceVariable(
-        "year",
-        new Date().getFullYear().toString(),
-        license
-    )
-
-    fs.writeFileSync(path.join(pathToProject, `LICENSE`), license)
-
-    debug("Done!")
 
     debug(`Adding new project to 'projects.json'`)
     addProject({
@@ -309,7 +322,20 @@ export function createProject(
     debug(`Added!`)
     debug()
 
-    execSync("git init", { cwd: pathToProject })
+    try {
+        if (git) gitifyProject(projectName)
+    } catch (err) {
+        warn("Error while initializing git repo. Operation skipped.")
+    }
+
+    try {
+        licenseProject(projectName, licenseName)
+    } catch (err) {
+        warn("Error while adding LICENSE. Operation skipped.")
+    }
+
+    log()
+    log("--> You're all done! Happy coding!")
 }
 
 /**
@@ -364,13 +390,10 @@ export function importProject(pathToProject: string) {
         )
     }
 
-    if (!fs.existsSync(pathToProject)) {
+    if (isNanOrEmptyDirectory(pathToProject)) {
         throw new OrigeenError(
-            "The path you provided doesn't exist on your machine.",
-            [
-                "Check the spelling",
-                "Use an absolute path to the project you're importing, if that's not already the case.",
-            ]
+            "The provided path does not point to a non-empty existing directory",
+            ["Check the spelling", "Create a project instead"]
         )
     }
 
@@ -452,4 +475,50 @@ export async function deleteProject(projectName: string) {
     removeProject(projectName)
 
     debug("Unregistered!")
+}
+
+/**
+ * Adds a LICENSE to a project
+ *
+ * @param projectName the name of an existing project
+ * @param licenseName the name of the license (e.g. MIT, ISC...)
+ */
+export function licenseProject(projectName: string, licenseName: string): void {
+    if (!isSupportedLicense(licenseName)) {
+        throw new OrigeenError(
+            `The name of the license you gave is not supported by Origeen`,
+            [
+                "Choose another license",
+                `Wait for the '${licenseName}' license to be added. (you should open an issue in this case)`,
+            ]
+        )
+    }
+
+    console.log("Adding LICENSE...")
+    const pathToProject = getPathToProject(projectName)
+    const name = getConfig().userName
+    let license = fs.readFileSync(
+        path.join(LICENSES, `${licenseName}.md`),
+        "utf-8"
+    )
+    license = replaceVariable("name", name, license)
+    license = replaceVariable(
+        "year",
+        new Date().getFullYear().toString(),
+        license
+    )
+
+    fs.writeFileSync(path.join(pathToProject, `LICENSE`), license)
+}
+
+/**
+ * Initialized a git repository in the root of a project
+ *
+ * @param projectName the name of an existing project
+ */
+export function gitifyProject(projectName: string) {
+    const pathToProject = getPathToProject(projectName)
+
+    console.log("Intializing git repo...")
+    execSync("git init", { cwd: pathToProject })
 }
