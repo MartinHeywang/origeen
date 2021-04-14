@@ -68,7 +68,6 @@ const cli = meow({
         },
         license: {
             type: "string",
-            default: "ISC",
             required: false
         },
         noGit: {

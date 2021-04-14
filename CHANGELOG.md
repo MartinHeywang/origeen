@@ -4,6 +4,7 @@
 
 - Fixed: can't import the same project twice
 - Fixed: can create projects in sub folders of the workspace
+- Fixed: confusion b/w the project name and the one passed as cmd argument (which may be a path too)
 
 ### v0.5.1
 

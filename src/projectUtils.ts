@@ -23,6 +23,7 @@ export interface Project {
     name: string
     path: string
     license?: string
+    git?: boolean
 
     createdAt?: number
     importedAt?: number
@@ -38,7 +39,15 @@ let _loadProjects = loadProjects()
  * then returns it each time it is called
  */
 function* loadProjects() {
+    const {debug} = console
+
     const projects = fs.readJSONSync(PROJECTS)
+    
+
+    debug("The projects file has been loaded:")
+    debug(JSON.stringify(projects, undefined, 4))
+    debug(`Path: '${PROJECTS}'`)
+    debug()
 
     while (true) {
         yield projects
@@ -108,7 +117,9 @@ export function getProjects() {
  */
 export function projectExists(projectName: string) {
     console.log("Checking if the project already exists...")
-    return getProjects().some((project) => project.name === projectName)
+    return getProjects().some(
+        (project) => project.name === path.basename(projectName)
+    )
 }
 
 /**
@@ -213,18 +224,27 @@ function isNanOrEmptyDirectory(pathToFolder: string): boolean {
 export function createProject(
     projectName: string,
     templateName = EMPTY_TEMPLATE,
-    licenseName = "ISC",
+    licenseName?: string,
     git?: boolean
 ) {
     const { debug, log, warn } = console
 
+    const actualProjectName = path.basename(projectName)
+
+    const pathToProject = path.resolve(getProperty("workspace"), projectName)
+    debug(`Absolute path to project:`)
+    debug(pathToProject)
+    debug()
+
     log("Creating a project")
     log()
     log(`Name: ${projectName}`)
+    log(`Path: ${pathToProject}`)
     log(`Template: ${templateName}`)
+    licenseName && log(`License: ${licenseName}`)
     log()
 
-    if (!isValidName(projectName)) {
+    if (!isValidName(actualProjectName)) {
         throw new OrigeenError("The project name is not valid.", [
             "Check that it is alpha-numerical. (it can still contain '-', '.', '_')",
         ])
@@ -232,7 +252,7 @@ export function createProject(
 
     if (projectExists(projectName)) {
         throw new OrigeenError(
-            `You can't create two projects with the name. '${projectName}' is already used.`,
+            `You can't create two projects with the name. '${actualProjectName}' is already used.`,
             [
                 "Choose another name",
                 "Check the spelling",
@@ -240,11 +260,6 @@ export function createProject(
             ]
         )
     }
-
-    const pathToProject = path.resolve(getProperty("workspace"), projectName)
-    debug(`Absolute path to project:`)
-    debug(pathToProject)
-    debug()
 
     log("Checking if the folder already exists...")
     if (!isNanOrEmptyDirectory(pathToProject)) {
@@ -285,12 +300,14 @@ export function createProject(
         ])
     }
 
-    log("Checking if the license is valid...")
-    if(!isSupportedLicense(licenseName)) {
+    licenseName != undefined
+        ? log("Checking if the license is valid...")
+        : warn("No license provided.")
+    if (licenseName && !isSupportedLicense(licenseName)) {
         throw new OrigeenError("The provided license is not supported yet.", [
             "Check the spelling",
             "Choose another license",
-            `Request '${licenseName}' to be added on GitHub.`
+            `Request '${licenseName}' to be added on GitHub.`,
         ])
     }
 
@@ -311,27 +328,28 @@ export function createProject(
 
     debug(`Adding new project to 'projects.json'`)
     addProject({
-        name: projectName,
+        name: actualProjectName,
         path: pathToProject,
         createdAt: Date.now(),
         importedAt: -1,
         lastOpenedAt: -1,
         openings: 0,
         license: licenseName,
+        git: git ? true : false,
     })
     debug(`Added!`)
     debug()
 
     try {
-        if (git) gitifyProject(projectName)
+        licenseName != undefined && licenseProject(actualProjectName, licenseName)
     } catch (err) {
-        warn("Error while initializing git repo. Operation skipped.")
+        warn("Error while adding LICENSE. Operation skipped.")
     }
 
     try {
-        licenseProject(projectName, licenseName)
+        git === true && gitifyProject(actualProjectName)
     } catch (err) {
-        warn("Error while adding LICENSE. Operation skipped.")
+        warn("Error while initializing git repository. Operation skipped.")
     }
 
     log()
@@ -399,11 +417,11 @@ export function importProject(pathToProject: string) {
 
     const projectName = path.basename(pathToProject)
 
-    if(projectExists(projectName)) {
-        throw new OrigeenError(`A project named: ${projectName} already exist.`, [
-            "Rename the folder",
-            `Delete the project named: '${projectName}'`
-        ])
+    if (projectExists(projectName)) {
+        throw new OrigeenError(
+            `A project named: ${projectName} already exist.`,
+            ["Rename the folder", `Delete the project named: '${projectName}'`]
+        )
     }
 
     if (isSubProject(pathToProject)) {
@@ -524,8 +542,15 @@ export function licenseProject(projectName: string, licenseName: string): void {
  * @param projectName the name of an existing project
  */
 export function gitifyProject(projectName: string) {
-    const pathToProject = getPathToProject(projectName)
+    const cwd = getPathToProject(projectName)
 
     console.log("Intializing git repo...")
-    execSync("git init", { cwd: pathToProject })
+    execSync("git init", { cwd })
+    try {
+        execSync("git add .", { cwd })
+        execSync('git commit -m "Initial commit"', { cwd })
+    } catch (err) {
+        // Not a big deal :=)
+        // An error caught in here would be an empty commit for example
+    }
 }
