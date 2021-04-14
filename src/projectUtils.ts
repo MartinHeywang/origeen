@@ -119,7 +119,7 @@ export function projectExists(projectName: string) {
  * @returns true if the name is valid, otherwise false
  */
 export function isValidName(projectName: string): boolean {
-    const regex = new RegExp(`^[a-zA-Z0-9_\\.\\-]+$`)
+    const regex = new RegExp(`^[a-zA-Z0-9_\\.\\-/]+$`)
 
     console.log("Checking project name...")
     if (!projectName.match(regex)) return false

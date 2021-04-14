@@ -2,11 +2,13 @@
 
 ### v0.5.2
 
-- Fixed : can't import the same project twice
+- Fixed: can't import the same project twice
+- Fixed: can create projects in sub folders of the workspace
 
 ### v0.5.1
 
 - Fixed "name" validator in the setup command
+
 ### v0.5.0
 
 - Added the "git repo" feature : creates a git repo for each project.
