@@ -37,7 +37,7 @@ async function execute() {
     log("specified in the LICENSE of each project.")
 
     const name = await ask("Name? ", (answer) => {
-        if (answer.match(new RegExp(`^[a-zA-Z0-9\\ ]+$`)))
+        if (!answer.match(new RegExp(`^[a-zA-Z0-9\\ ]+$`)))
             return "Your name must be alphanumerical"
         return undefined
     })
