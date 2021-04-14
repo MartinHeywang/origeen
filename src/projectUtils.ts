@@ -397,6 +397,15 @@ export function importProject(pathToProject: string) {
         )
     }
 
+    const projectName = path.basename(pathToProject)
+
+    if(projectExists(projectName)) {
+        throw new OrigeenError(`A project named: ${projectName} already exist.`, [
+            "Rename the folder",
+            `Delete the project named: '${projectName}'`
+        ])
+    }
+
     if (isSubProject(pathToProject)) {
         throw new OrigeenError(
             `Origeen doesn't support sub-projects\n` +
@@ -409,8 +418,6 @@ export function importProject(pathToProject: string) {
             ]
         )
     }
-
-    const projectName = path.basename(pathToProject)
 
     log("Importing a project...")
     log(`Name: ${projectName}`)

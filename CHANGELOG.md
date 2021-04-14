@@ -1,5 +1,9 @@
 # Origeen's changelog
 
+### v0.5.2
+
+- Fixed : can't import the same project twice
+
 ### v0.5.1
 
 - Fixed "name" validator in the setup command
