@@ -20,7 +20,7 @@ const descriptor: Command = {
     options: {},
 }
 
-function execute(): void {
+async function execute() {
     const projectName: string = positionals()[0]
 
     if (projectName == undefined) {

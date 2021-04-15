@@ -2,9 +2,10 @@
 
 ### v0.5.2
 
-- Fixed: can't import the same project twice
-- Fixed: can create projects in sub folders of the workspace
+- Fixed: can import the same project twice
+- Fixed: can't create projects in sub folders of the workspace
 - Fixed: confusion b/w the project name and the one passed as cmd argument (which may be a path too)
+- Fixed: open command not exiting until the editor is opened
 
 ### v0.5.1
 

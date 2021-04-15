@@ -1,18 +1,16 @@
 import fs from "fs-extra"
 import path from "path"
+import { spawn, execSync } from "child_process"
 import { getConfig, getProperty } from "./configUtils"
-
-import { EMPTY_TEMPLATE, LICENSES, PROJECTS, TEMPLATES } from "./paths"
 import { OrigeenError } from "./errors"
-import { ask, bash, booleanValidator } from "./logUtils"
-import { execFileSync } from "child_process"
 import { replaceVariable } from "./licenses"
+import { ask, bash, booleanValidator } from "./logUtils"
+import { EMPTY_TEMPLATE, LICENSES, PROJECTS } from "./paths"
 import {
     checkBashRequirements,
     getTemplateLocation,
     templateExists,
 } from "./templateUtils"
-import { execSync } from "child_process"
 
 /**
  * The Project interface defines a project, as considered by Origeen.
@@ -39,10 +37,9 @@ let _loadProjects = loadProjects()
  * then returns it each time it is called
  */
 function* loadProjects() {
-    const {debug} = console
+    const { debug } = console
 
     const projects = fs.readJSONSync(PROJECTS)
-    
 
     debug("The projects file has been loaded:")
     debug(JSON.stringify(projects, undefined, 4))
@@ -341,7 +338,8 @@ export function createProject(
     debug()
 
     try {
-        licenseName != undefined && licenseProject(actualProjectName, licenseName)
+        licenseName != undefined &&
+            licenseProject(actualProjectName, licenseName)
     } catch (err) {
         warn("Error while adding LICENSE. Operation skipped.")
     }
@@ -377,7 +375,12 @@ export function openProject(projectName: string) {
     debug()
 
     try {
-        execFileSync(editorPath, [project.path], { encoding: "utf8" })
+        const subprocess = spawn(editorPath, [project.path], {
+            detached: true,
+            stdio: "ignore",
+        })
+
+        subprocess.unref()
     } catch (error) {
         throw new OrigeenError(
             `Origeen tried to run your favourite code editor\n` +
