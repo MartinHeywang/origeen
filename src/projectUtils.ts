@@ -222,7 +222,8 @@ export function createProject(
     projectName: string,
     templateName = EMPTY_TEMPLATE,
     licenseName?: string,
-    git?: boolean
+    git = true,
+    open = false
 ) {
     const { debug, log, warn } = console
 
@@ -349,6 +350,8 @@ export function createProject(
     } catch (err) {
         warn("Error while initializing git repository. Operation skipped.")
     }
+
+    if(open) openProject(actualProjectName)
 
     log()
     log("--> You're all done! Happy coding!")
