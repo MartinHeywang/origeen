@@ -90,9 +90,7 @@ function updateProject(project: Project): void {
  * @param projectName the name of the project to remove
  */
 function removeProject(projectName: string) {
-    const updatedProjects = getProjects().filter(
-        (project) => project.name !== projectName
-    )
+    const updatedProjects = getProjects().filter(project => project.name !== projectName)
     setProjects(updatedProjects)
 }
 
@@ -114,9 +112,7 @@ export function getProjects() {
  */
 export function projectExists(projectName: string) {
     console.log("Checking if the project already exists...")
-    return getProjects().some(
-        (project) => project.name === path.basename(projectName)
-    )
+    return getProjects().some(project => project.name === path.basename(projectName))
 }
 
 /**
@@ -142,17 +138,12 @@ export function isValidName(projectName: string): boolean {
  * @throws {OrigeenError} whenever the project doesn't exist
  */
 export function getProject(projectName: string): Project {
-    const project = getProjects().find(
-        (project) => project.name === projectName
-    )
+    const project = getProjects().find(project => project.name === projectName)
     if (project == undefined) {
-        throw new OrigeenError(
-            `A project named: ${projectName} was not found.`,
-            [
-                "Check the spelling",
-                `List all your projects: ${bash("projects")}`,
-            ]
-        )
+        throw new OrigeenError(`A project named: ${projectName} was not found.`, [
+            "Check the spelling",
+            `List all your projects: ${bash("projects")}`,
+        ])
     }
     return project
 }
@@ -251,11 +242,7 @@ export function createProject(
     if (projectExists(projectName)) {
         throw new OrigeenError(
             `You can't create two projects with the name. '${actualProjectName}' is already used.`,
-            [
-                "Choose another name",
-                "Check the spelling",
-                "Delete the existing project",
-            ]
+            ["Choose another name", "Check the spelling", "Delete the existing project"]
         )
     }
 
@@ -339,19 +326,19 @@ export function createProject(
     debug()
 
     try {
-        licenseName != undefined &&
-            licenseProject(actualProjectName, licenseName)
+        if (licenseName != undefined) licenseProject(actualProjectName, licenseName)
     } catch (err) {
         warn("Error while adding LICENSE. Operation skipped.")
     }
 
     try {
-        git === true && gitifyProject(actualProjectName)
+        debug(`Git is: ${git}`)
+        if (git) gitifyProject(actualProjectName)
     } catch (err) {
         warn("Error while initializing git repository. Operation skipped.")
     }
 
-    if(open) openProject(actualProjectName)
+    if (open) openProject(actualProjectName)
 
     log()
     log("--> You're all done! Happy coding!")
@@ -424,10 +411,10 @@ export function importProject(pathToProject: string) {
     const projectName = path.basename(pathToProject)
 
     if (projectExists(projectName)) {
-        throw new OrigeenError(
-            `A project named: ${projectName} already exist.`,
-            ["Rename the folder", `Delete the project named: '${projectName}'`]
-        )
+        throw new OrigeenError(`A project named: ${projectName} already exist.`, [
+            "Rename the folder",
+            `Delete the project named: '${projectName}'`,
+        ])
     }
 
     if (isSubProject(pathToProject)) {
@@ -485,8 +472,7 @@ export async function deleteProject(projectName: string) {
 
     const verification = await ask("Are you sure? ", booleanValidator)
     const notSoSure =
-        verification.toLowerCase() === "n" ||
-        verification.toLowerCase() === "no"
+        verification.toLowerCase() === "n" || verification.toLowerCase() === "no"
             ? true
             : false
 
@@ -528,16 +514,9 @@ export function licenseProject(projectName: string, licenseName: string): void {
     console.log("Adding LICENSE...")
     const pathToProject = getPathToProject(projectName)
     const name = getConfig().userName
-    let license = fs.readFileSync(
-        path.join(LICENSES, `${licenseName}.md`),
-        "utf-8"
-    )
+    let license = fs.readFileSync(path.join(LICENSES, `${licenseName}.md`), "utf-8")
     license = replaceVariable("name", name, license)
-    license = replaceVariable(
-        "year",
-        new Date().getFullYear().toString(),
-        license
-    )
+    license = replaceVariable("year", new Date().getFullYear().toString(), license)
 
     fs.writeFileSync(path.join(pathToProject, `LICENSE`), license)
 }

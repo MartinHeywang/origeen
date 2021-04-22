@@ -70,9 +70,9 @@ const cli = meow({
             type: "string",
             required: false
         },
-        noGit: {
+        git: {
             type: "boolean",
-            default: false,
+            default: true,
             required: false
         },
 

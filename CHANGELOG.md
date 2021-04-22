@@ -1,5 +1,11 @@
 # Origeen's changelog
 
+
+### v0.5.3
+
+- Fixed: --open (or -o) flag not working
+- Fixed: --no-git flag not working
+
 ### v0.5.2
 
 - Fixed: can import the same project twice

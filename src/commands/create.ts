@@ -18,8 +18,7 @@ const descriptor: Command = {
     ],
     options: {
         open: {
-            desc:
-                "Whether you want to open the project right after its creation",
+            desc: "Whether you want to open the project right after its creation",
             required: false,
             alias: ["o"],
         },
@@ -43,7 +42,7 @@ async function execute() {
     const templateName = (inputFlags.template as string) || "@empty"
     const licenseName = inputFlags.license
 
-    createProject(projectName, templateName, licenseName, !inputFlags.noGit, inputFlags.open)
+    createProject(projectName, templateName, licenseName, inputFlags.git, inputFlags.open)
 }
 
 export default { descriptor }
